@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/emendozaspx/classmanager.svg?branch=develop)](https://travis-ci.org/emendozaspx/classmanager)
 # classmanager
 A simple class manager with security and functionality
 
