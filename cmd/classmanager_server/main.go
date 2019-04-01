@@ -18,14 +18,14 @@ func main() {
 	 */
 
 	// static file handler, a callback function that serves static (React) files
-	static := http.FileServer(http.Dir("static"))
+	static := http.FileServer(http.Dir("web"))
 
 	// print instructions to console
-	fmt.Println("open localhost:8000 in web browser")
+	fmt.Println("open localhost:3000 in web browser")
 
 	// serve static files at http root
 	http.Handle("/", static)
 
 	// deploy dev server
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":3000", nil)
 }

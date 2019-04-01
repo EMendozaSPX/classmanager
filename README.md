@@ -13,3 +13,4 @@ This project uses the Apache 2.0 License in order to allow companies and corpora
 their needs. This comes from the Apache License’s explicit and lengthy agreement which protects the software in more 
 legal cases than other licenses and while striking a balance between copyleft software and proprietary license agreements.
 
+
