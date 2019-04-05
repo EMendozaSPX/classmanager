@@ -3,9 +3,15 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func main() {
+	e, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(e)
 	/*
 	// h is a callback function that handles http requests and responses
 	// h handles all graphql data requests and responses in the route /graphql
