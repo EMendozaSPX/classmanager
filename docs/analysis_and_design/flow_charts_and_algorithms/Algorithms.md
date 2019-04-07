@@ -47,7 +47,10 @@ END CreateEnvironmentConstants
 ### Login Form
 ```
 BEGIN LoginForm
-    let global_login_state = false
+    display input username_field
+    display input password_field
+    display input confirm_password_field
+    
     submit_button.event('click', Login)
 END LoginForm
 ```
@@ -56,10 +59,16 @@ END LoginForm
 ```
 BEGIN Login
     let account_type = student | teacher | admin
-    let username, password = get_username_state('username')
-    let password = get_password_state('password')
+    let username, password = get_username_state('username_field')
+    let password = get_password_state('password_field')
+    let confirm_password = get_password_state('confirm_password_field')
     
-    POST username, password, account_type TO server
+    IF password == confirm_password
+        POST username, password, account_type TO server
+    ELSE
+        REDIRECT TO /<usertype:string>/login
+        print(passwords dont match)
+    END IF
     
     IF response bool == true
         print(response msg)
@@ -87,13 +96,21 @@ BEGIN Login
     
     IF CompareHashAndPassword(password_hash, password)
         let user_email = get username from table user_type
-        json_web_token = jwt(sectret_key, [ account_type, username, user_email )
+        json_web_token = jwt(AccessPersistantConstants(SECRET_KEY), [ account_type, username, user_email )
         RESPOND (true, msg: Login Success, json_web_token)
         END Login
     END IF
     
     RESPOND (false, msg: Login failed, empty token)
 END Login
+```
+
+### Logout
+```
+BEGIN Logout
+    local.user_access_token = ''
+    Redirect to /
+END Logout
 ```
 
 ### Access protected url
@@ -125,7 +142,7 @@ END RequestProtectedRoute
 ```
 BEGIN VerifyToken(json_web_token, permitted_usertype)
     let secret_key, usertype, username = decode json_web_token
-    IF secret_key == SECRET_KEY AND usertype == permitted_usertype
+    IF secret_key == AccessPersistantConstant(SECRET_KEY) AND usertype == permitted_usertype
         let username = username
         IF username IN database table user_type
             RETURN true
@@ -155,6 +172,39 @@ END CompareHashAndPassword
 ```
 
 ## Admin
+
+### Set School Bounds
+```
+BEGIN SetBounds
+    display select school_week = weekly | bi-weekly
+    
+    display select period = begin | recess | lunch | end | 1 | 2 | 3 .... 16
+    display input start_time
+    display input end_time
+    
+    IF add.button(click)
+        display select period = begin | recess | lunch | end | 1 | 2 | 3 | .... 16
+        display input start_time = previous end_time
+        display input end_time
+    END IF
+    
+    display input term_one, start_time, end_time
+    display input term_two, start_time, end_time
+    display input term_three, start_time, end_time
+    display input term_four, start_time, end_time
+    
+    IF submit.event(click)
+        POST all fields TO server
+    END IF
+END SetBounds
+```
+
+### Store School Bounds
+```
+BEGIN StoreBounds
+    LISTEN FOR school_week, [[period, start_time, end_time]], [term_one, start_time, end_time]... SAVE IN environment.json
+END StoreBounds
+```
 
 ### View List of Users
 * Note: view list of users does not display passwords because passwords are not stored in database
@@ -193,103 +243,225 @@ BEGIN GetUsersList
 END GetUsersList
 ```
 
-### Create a user server function
+### Create a User
 ```
-BEGIN CreateUser(account_type, username, email, password)
-    let password_hash = SaltAndHash(password)
+BEGIN CreateUser
+    display username_field
+    display email_field
+    display password_field
     
-    let error = STORE username, email, password_hash in database table account_type
-    
-    IF lengthof(error) >= 0
-        IF error == username not unique
-            RETURN (false, username not unique error)
-        ELSE IF error == email not unique
-            RETURN (false, email not unique)
-        ELSE
-            RETURN (false, error)
-        END IF
-    END IF
-    RETURN true
-END CreateUser
-```
-
-### Admin User Information Panel
-```
-BEGIN AdminUserPanel(admin_user)
-    let username_field = display admin_user.username
-    let email_field = display admin_user.email
-    let password_field = empty string
-    
-    IF username_field changed
-        username_field state = new username_field state
-    ELSE IF email_field changed
-        email_field state = new email_field state
-    END IF
-    
-    IF submit.event(click)
-        POST (json_web_token, user.id, username_field, email_field, password_field) TO server
-    END IF
-END AdminUserPanel
-```
-
-### Update Admin User server side
-```
-BEGIN UpdateAdminUser
-    json_web_token, user_id, username, email, password = LISTEN FOR user.id, username_field, email_field, password_field
-    IF VerifyToken(json_web_token) AND user_id IN database table user_type
-        IF username NOT == user.username
-            user.username = username
-        END IF
-        
-        IF email NOT == user.email
-            user.email = email
-        END IF
-        
-        user.password = SaltAndHash(password)
-    END IF
-```
-
-### Create an Admin User
-```
-BEGIN CreateAdminUser
-    password_field
     IF submit_button.event('click') AND all_fields NOT == null
-         POST (json_web_token, username, email, password) TO server
+         POST (json_web_token, user_type, username, email, password) TO server
          RECEIVE is_success, error
             
          IF NOT is_success
              print(error)
+             
          ELSE
-             REDIRECT TO /admin/admins/
+             REDIRECT TO /admin/<user_type:string>/
+             
     ELSE
          highlight null fields
+         
     END IF
 END CreateAdminUser
 ```
 
-### Create an Admin User server side
+### Create User Server Side
 ```
-BEGIN CreateAdminUser
-    let json_web_token, username, email, password = LISTEN FOR json_web_token, username, email, password
+BEGIN CreateUser
+    let json_web_token, user_type, username, email, password = LISTEN FOR json_web_token, username, email, password
     
-    IF VerifyToken(json_web_token, admin)
-        let success, error = CreateUser(admin, username, email, password)
-        
-        IF success
-            RESPOND success
-        ELSE
-            RESPOND (success, error)
+    IF VerifyUser(json_web_token, admin)
+        let password_hash = SaltAndHash(password)
+    
+        STORE username, email, password_hash in database table account_type
+    
+        IF STORE Failed
+            IF username not unique error
+                RESPOND false, username not unique
+            ELSE IF email not unique error
+                RESPOND false, email not unique
+            ELSE
+                RESPOND false, store_error
+            END IF
         END IF
         
     ELSE
-        RESPOND false, user verification failed
-    
-    END IF
-END CreateAdminUser
+        RESPOND true
+END CreateUser
 ```
 
-### Create a Class
+### View User
+```
+BEGIN ViewUser
+    GET user WITH user_type, user_id FROM server
+    
+    let username_field = display user.username
+    let email_field = display user.email
+    let password_field = empty string
+    let confirm_password_field = empty string
+    
+    let changed_state = false
+    
+    IF username_field changed OR email_field changed OR lengthof(password_field) > 0
+        changed_state = true
+    END IF
+    
+    IF submit.event(click) AND changed_state
+        POST (json_web_token, user.id, user.type, username_field, email_field, password_field) TO server
+    END IF
+    
+    IF delete.event(click)
+        POST json_web_token, user.type, user.id TO server
+    END IF
+END ViewUser
+```
+
+### Read User
+```
+BEGIN ReadUser
+    let user_type, user_id = LISTEN FOR user_type, user_id
+    
+    IF user_id IN database table user_type
+        RESPOND user_type[user_id]
+    ELSE
+        RESPOND user not found error
+    END IF
+END ReadUser
+```
+
+### Update User
+```
+BEGIN UpdateUser
+    let json_web_token, user_id, user_type, username, email, password = LISTEN FOR json_web_token, user_id, username, email, password
+    
+    IF VerifyToken(json_web_token, admin)
+        IF user_id IN database table user_type
+            let password_hash = HashAndSalt(password)
+            
+            STORE user_id, username, email, password_hash IN database table user_type
+        END IF
+    END IF
+END UpdateUser
+```
+
+### Delete User
+```
+BEGIN DeleteUser
+    let json_web_token, user_type, user_id = LISTEN FOR json_web_token, user_type, user_id
+    
+    IF VerifyToken(json_web_token, admin)
+        DELETE user_id FROM database table user_type
+    END IF
+END DeleteUser
+```
+
+### Create Class
 ```
 BEGIN CreateClass
-    let class
+    display input class_id_field
+    display select year_group_field
+    display select teacher_field
+    
+    let student_array = []
+    COUNT EACH student IN student_array
+        display select student_field
+    END COUNT EACH
+    
+    IF add_student.event(click)
+        student_array.append_student
+    END IF
+    
+    let period_array = [[select_period, select_day]
+    COUNT EACH period IN periods
+        display select period[select_period]
+        display select period[select_day]
+    END COUNT EACH
+    
+    IF add_period.event(click)
+        period_array.append([select_period, select_day])
+    END IF
+    
+    POST json_web_token, class_id_field, year_group_field, teacher_field, student_array, period_array TO server
+    IF RESPONSE == error
+        display error
+    END IF
+END CreateClass
 ```
+
+### Create Class Server Side
+```
+BEGIN CreateClass
+    LISTEN FOR json_web_token, class_id, year_group, teacher, student_array, period_array
+    
+    IF VerifyToken(json_web_token, admin)
+        STORE class_id, year_group, teacher IN database table Classes
+        get class_primary_key WITH class_id FROM database table Classes
+    
+        COUNT EACH student IN student_array
+            STORE class_id, student.id IN database table student_class
+        END COUNT EACH
+    
+        COUNT EACH periods IN period_array
+            STORE periods[period], periods[day] IN database table timetable
+        END COUNT EACH
+    
+        IF error
+            RESPOND error
+        END IF
+    END IF
+END CreateClass
+```
+
+### View Class
+```
+BEGIN ViewClass
+    GET Class, students_array, periods_array WITH json_web_token, class_primary_key FROM server
+    
+    display input class_id_field = class.class_id
+    display select year_group_field = class.year_group
+    display select teacher_field = class.teacher_id
+    
+    let student_array = []
+    COUNT EACH student IN student_array
+        display select student_field
+    END COUNT EACH
+    
+    IF add_student.event(click)
+        student_array.append_student
+    END IF
+    
+    let period_array = [[select_period, select_day]
+    COUNT EACH period IN periods
+        display select period[select_period]
+        display select period[select_day]
+    END COUNT EACH
+    
+    IF add_period.event(click)
+        period_array.append([select_period, select_day])
+    END IF
+    
+    POST class_id_field, year_group_field, teacher_field, student_array, period_array TO server
+    IF RESPONSE == error
+        display error
+    END IF
+```
+
+### Read Class
+```
+BEGIN ReadClass
+    LISTEN FOR get_request, json_web_token, class_primary_key
+    
+    IF VerifyToken(json_web_token, admin)
+        get class, students_list, periods_list FROM database table Classes, student_class, periods
+        RESPOND class, students_list, periods_list
+    ELSE
+        RESPOND error
+    END IF
+END ReadClass
+```
+### Update Class
+
+### Delete Class
+
