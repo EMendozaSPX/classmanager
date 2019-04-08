@@ -357,6 +357,35 @@ BEGIN DeleteUser
 END DeleteUser
 ```
 
+### View List of Classes
+```
+BEGIN ViewClassesList
+    GET classes_list USING json_web_token FROM server
+    
+    COUNT EACH class IN classes_list
+        display class
+    END COUNT EACH
+    
+END ViewClassesList
+```
+
+### View List of Classes Server Side
+```
+BEGIN ViewClassesList
+    LISTEN FOR json_web_token
+    
+    IF VerifyToken(json_web_token, admin)
+        let classes_list = []
+        
+        COUNT EACH class IN database table Classes
+            classes_list.append(class)
+        END COUNT EACH
+        
+        RESPOND classes_list
+    END IF
+END ViewClassesList
+```
+
 ### Create Class
 ```
 BEGIN CreateClass
@@ -419,6 +448,8 @@ END CreateClass
 BEGIN ViewClass
     GET Class, students_array, periods_array WITH json_web_token, class_primary_key FROM server
     
+    let changed_state = false
+    
     display input class_id_field = class.class_id
     display select year_group_field = class.year_group
     display select teacher_field = class.teacher_id
@@ -430,6 +461,7 @@ BEGIN ViewClass
     
     IF add_student.event(click)
         student_array.append_student
+        changed_state = true
     END IF
     
     let period_array = [[select_period, select_day]
@@ -440,12 +472,20 @@ BEGIN ViewClass
     
     IF add_period.event(click)
         period_array.append([select_period, select_day])
+        changed_state = true
     END IF
     
-    POST class_id_field, year_group_field, teacher_field, student_array, period_array TO server
-    IF RESPONSE == error
-        display error
+    IF changed_state
+        POST json_web_token, Class.id, class_id_field, year_group_field, teacher_field, student_array, period_array TO server
+        IF RESPONSE == error
+            display error
+        END IF
     END IF
+    
+    IF delete_user.event(click)
+        POST User.id TO server
+    END IF
+END ViewClass
 ```
 
 ### Read Class
@@ -461,7 +501,235 @@ BEGIN ReadClass
     END IF
 END ReadClass
 ```
+
 ### Update Class
+```
+BEGIN UpdateClass
+    LISTEN FOR json_web_token, class_id_int, class_id_string, year_group, teacher, student_array, period_array
+    
+    IF VerifyToken(json_web_token, admin)
+        get teacher_id using teacher in dataabase table Teachers
+        STORE class_id_string, year_group, teacher_id IN database table Classes USING class_id_int
+        
+        let student_id_array = []
+        COUNT EACH student IN student_array
+            get student_id using student from database table Students
+            student_id_array.append(student)
+        END COUNT EACH
+        
+        COUNT EACH student_id IN student_id_array
+            STORE class_id_int, student_id IN database table student_class
+        END COUNT EACH
+        
+        COUNT EACH period IN period_array
+            STORE period, class_id_int IN database table timetable
+        END COUNT EACH
+        
+        IF error
+            RESPOND error
+        END IF
+    
+    ELSE
+        RESPOND error
+    
+    END IF
+END UpdateClass
+```
 
 ### Delete Class
+```
+BEGIN DeleteClass
+    LISTEN FOR json_web_token, class_id
+    
+    IF VerifyToken(json_web_token, admin)
+        DELETE class class_id FROM database table Classes
+    
+        COUNT EACH item IN database table student_class USING class_id
+            DELETE item
+        END COUNT EACH
+    
+        COUNT EACH item IN database table timetable USING class_id
+            DELETE item
+        END IF
+    END IF
+END DeleteClass
+```
 
+## Teachers
+
+### View Students List
+```
+BEGIN ViewStudentsList
+    GET list_of_students FROM server WITH json_web_token
+    
+    COUNT EACH student IN list_of_students
+        display student
+    END COUNT EACH
+END ViewStudentsList
+```
+
+### View Students List Server Side
+```
+BEGIN ViewStudentsList
+    LISTEN FOR json_web_token
+    
+    IF VerifyToken(json_web_token, teacher)
+        get list_of_students from database table Student
+    END IF
+END ViewStudentsList
+```
+
+### View Timetable
+```
+BEGIN ViewTimetable
+    GET timetable FROM server WITH json_web_token, teacher_id, date.now()
+    
+    let school_day = RESPONSE
+    IF school_day
+        let periods, classes_periods = RESPONSE
+        COUNT EACH period IN periods
+            IF period IN classes_periods
+                display classes_periods[period[0]]
+                display classes_periods[period[1]]
+                display classes_periods[period[2]]
+            ELSE
+                display free period
+            END IF
+        END COUNT EACH
+        
+    ELSE
+        let holiday = RESPONSE
+        display holiday
+        
+    END IF
+END ViewTimetable
+```
+
+### View Timetable Server Side
+* note: server uses clients time for the sake of internationalisation
+```
+BEGIN ViewTimetable
+    LISTEN FOR json_web_token, teacher_id, date
+    
+    IF VerifyToken(json_web_token, teacher)
+        let term_one = AccessPersistantConstants[term_one]
+        let term_two = AccessPersistantConstants[term_two]
+        let term_three = AccessPersistantConstants[term_three]
+        let term_four = AccessPersistantConstants[term_four]
+        let holidays = AccessPersistantConstants[holidays]
+        
+        let holiday: boolean
+        let term: term
+        
+        MATCH date
+            CASE term_one[start] > date AND term_one[end] < date
+                holiday = false
+                term = term_one
+                BREAk
+            CASE term_two[start] > date AND term_two[end] < date
+                holiday = false
+                term = term_two
+                BREAK
+            CASE term_three[start] > date AND term_three[end] < date
+                holiday = false
+                term = term_three
+                BREAK
+            CASE term_four[start] > date AND term_four[end] < date
+                holiday = false
+                term = term_four
+                BREAK
+            ELSE
+                holiday = true
+                term = holidays
+        END MATCH
+        
+        IF NOT holiday AND date IN holidays
+            holiday = true
+        END IF
+        
+        IF NOT holiday
+            RESPOND NOT holiday
+            let week_rotation = AccessPersistantConstant(weeks)
+            let day = 0
+            COUNT d = term.start_day, d == date, d += 1
+                IF week_rotation == biweekly
+                    IF day >= 14
+                        day = 1
+                    END IF
+                    day += 1
+               
+                ELSE IF week_rotation == weekly
+                    IF day >= 7
+                        day = 1
+                    END IF
+                    day +=1
+               
+                END IF
+            END COUNT
+            get periods from database table timetable with teacher_id
+            RESPOND periods, AccessPersistantConstant(periods)
+        
+        ELSE
+            RESPOND holiday
+            RESPOND holidays[date]
+        
+        END IF
+    END IF
+END ViewTimetable
+```
+
+### View Class
+```
+BEGIN ViewClass
+    GET Class, students_list, periods FROM server WITH class_id, json_web_token
+    
+    display class_name
+    display class_year
+    display class_teacher
+    FOR EACH student IN students_list
+        display student
+    END FOR EACH
+    FOR EACH period IN periods
+        display period[period]
+        display period[date]
+    END FOR EACH
+END ViewClass
+```
+
+### View Class Server Side
+
+
+### Create Behaviour Notes
+
+
+### Read Behaviour Notes
+
+
+### Update Behaviour Notes
+
+
+### Delete Behaviour Notes
+
+
+### Create Task
+
+
+### Create Task Server Side
+
+
+### View Task
+
+
+### Read Task
+
+
+### Update Task
+
+
+### Delete Task
+
+
+### Mark Students Response
+
+
+### Mark Students Response Server Side
