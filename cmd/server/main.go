@@ -2,26 +2,24 @@ package main
 
 import (
 	"fmt"
+	"github.com/emendoza/classmanager/pkg/Data"
+	"github.com/graphql-go/handler"
+	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
-	e, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(e)
-	/*
 	// h is a callback function that handles http requests and responses
 	// h handles all graphql data requests and responses in the route /graphql
 	h := handler.New(&handler.Config{
-
+		Schema: &Data.Schema,
+		Pretty: true,
+		GraphiQL: false,
+		Playground: true,
 	})
 
 	// Creates the http route graphql
 	http.Handle("/graphql", h)
-	 */
 
 	// static file handler, a callback function that serves static (React) files
 	static := http.FileServer(http.Dir("web"))
@@ -33,5 +31,10 @@ func main() {
 	http.Handle("/", static)
 
 	// deploy dev server
-	http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(":3000", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
