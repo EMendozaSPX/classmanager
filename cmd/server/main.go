@@ -31,7 +31,7 @@ func main() {
 	http.Handle("/", static)
 
 	// deploy dev server
-	err := http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(":8080", nil)
 
 	if err != nil {
 		log.Fatal(err)

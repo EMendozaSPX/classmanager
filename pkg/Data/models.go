@@ -26,17 +26,24 @@ type Student struct {
 	Password string `json:"password"`
 }
 
-// Create a graphql object called Login Admin that stores a username and password
-var loginAdminType = graphql.NewObject(
+
+
+var adminType = graphql.NewObject(
 	graphql.ObjectConfig{
-	    Name: "LoginAdmin",
-	    Fields: graphql.Fields{
-		    "username": &graphql.Field{
-			    Type: graphql.String,
-		    },
-		    "password": &graphql.Field{
-			    Type: graphql.String,
-		    },
-	    },
-    },
-)
+		Name: "Admins",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"username": &graphql.Field{
+				Type: graphql.String,
+			},
+			"email": &graphql.Field{
+				Type: graphql.String,
+			},
+			"password": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+	)
