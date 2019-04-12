@@ -2,11 +2,11 @@ package Data
 
 import (
 	"github.com/graphql-go/graphql"
-	"log"
 )
 
 var Schema graphql.Schema
 
+/*
 func init() {
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
@@ -52,3 +52,4 @@ func init() {
 		log.Println(err)
 	}
 }
+*/

@@ -1,9 +1,21 @@
 package Auth
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
+
+func GenerateSecretKey() string {
+	key := make([]byte, 32)
+	_, err := rand.Read(key)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(key)
+}
 
 func HashAndSalt(password string) string {
 	// Cast password to a byte array

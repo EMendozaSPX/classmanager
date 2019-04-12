@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/emendoza/classmanager/pkg/Env"
-	"log"
-	"net/http"
 )
 
 func main() {
+	/*
 	// Creates the http route graphql
 	http.HandleFunc("/graphql", Env.GraphQLHandler)
 
@@ -27,4 +26,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	*/
+
+	fmt.Println(Env.GetSecretKey())
 }
