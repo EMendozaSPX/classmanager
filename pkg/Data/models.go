@@ -7,7 +7,6 @@ type Admin struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 // Teacher user struct that serializes into json
@@ -15,7 +14,6 @@ type Teacher struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 // Student user struct that serializes into json
@@ -23,7 +21,6 @@ type Student struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 
@@ -39,9 +36,6 @@ var adminType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"email": &graphql.Field{
-				Type: graphql.String,
-			},
-			"password": &graphql.Field{
 				Type: graphql.String,
 			},
 		},

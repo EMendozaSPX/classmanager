@@ -1,6 +1,7 @@
 package Env
 
 import (
+	"bufio"
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -12,7 +13,13 @@ import (
 
 // a struct type that holds all information not stored in a database
 type EnvVariables struct {
-	SECRET_KEY string `json:"secret_key"`
+	SECRET_KEY   string       `json:"secret_key"`
+	DBUser       DatabaseUser `json:"database_user"`
+}
+
+type DatabaseUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // this function gets the secret key used to sign the json web tokens from the env file
@@ -27,6 +34,12 @@ func GetSecretKey() []byte {
 		return nil
 	}
 	return secretKey
+}
+
+// get database user information from env.json file
+func GetDatabaseUser() DatabaseUser {
+	envVariables := importVariables()
+	return envVariables.DBUser
 }
 
 // this function generates a env.json file at the root of the executable if it is not found
@@ -65,8 +78,30 @@ func writeFile(variables EnvVariables) {
 func createVariables() EnvVariables {
 	fmt.Println("Generating secret key ...")
 	secretKey := Auth.GenerateSecretKey()
+
+	// create a reader to read input streams from the commandline
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("Enter postgres username")
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(username)
+
+	fmt.Println("Enter postgres password")
+	password, err := reader.ReadString('\n')
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(password)
+
 	return EnvVariables{
 		SECRET_KEY: secretKey,
+		DBUser: DatabaseUser{
+			Username: username,
+			Password: password,
+		},
 	}
 }
 

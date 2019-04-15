@@ -1,18 +1,52 @@
 package Data
 
 import (
+	"database/sql"
+	"fmt"
+	"github.com/emendoza/classmanager/pkg/Env"
 	"github.com/graphql-go/graphql"
+	"log"
+
+	_ "github.com/lib/pq"
 )
 
-var Schema graphql.Schema
+var (
+	Schema graphql.Schema
+	db     *sql.DB
+)
 
-/*
+
 func init() {
+	// create a error variable to handle errors
+	var err error
+
+	// Setup database connection
+	// get database user information from the env.json file
+	dbUser := Env.GetDatabaseUser()
+
+	// create a postgres database config string using the user information from the previous line
+	connStr := fmt.Sprintf("user=%v password=%v dbname=classmanager port=5433 sslmode=disable",
+		dbUser.Username, dbUser.Password)
+
+	// open sql database with the set configuration
+	db, err = sql.Open("postgres", connStr)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// defer closing the database to the end of the program
+	// defer db.Close()
+
+	// create a root query type
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
-			Type: graphql.
-		}
+			"listAdmins": &graphql.Field {
+				Type: graphql.NewList(adminType),
+				Description: "Get a list of admin users",
+				Resolve: listAdminsResolver,
+			},
+		},
 	})
 
 
@@ -37,9 +71,6 @@ func init() {
 		},
 	})
 
-	// create an error variable
-	var err error
-
 	// create a new graphql schema using the query and mutation types, if failed returns an error
 	Schema, err = graphql.NewSchema(
 		graphql.SchemaConfig{
@@ -52,4 +83,3 @@ func init() {
 		log.Println(err)
 	}
 }
-*/

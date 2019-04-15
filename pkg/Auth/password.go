@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+// generates a secret key used for authentication
 func GenerateSecretKey() string {
 	key := make([]byte, 32)
 	_, err := rand.Read(key)
@@ -29,4 +30,14 @@ func HashAndSalt(password string) string {
 
 	// return hash casted to a string
 	return string(hash)
+}
+
+func VerifyPassword(password string, hash string) bool {
+	byteHash := []byte(hash)
+	bytePass := []byte(password)
+	if err := bcrypt.CompareHashAndPassword(byteHash, bytePass); err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }
