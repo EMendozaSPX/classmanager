@@ -68,6 +68,32 @@ func init() {
 				},
 				Resolve: authenticateAdmin,
 			},
+			"signinTeacher": &graphql.Field{
+				Type: graphql.String,
+				Description: "sign in teacher users through json web tokens",
+				Args: graphql.FieldConfigArgument{
+					"username": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"password": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: authenticateTeacher,
+			},
+			"signinStudent": &graphql.Field{
+				Type: graphql.String,
+				Description: "sign in student users through json web tokens",
+				Args: graphql.FieldConfigArgument{
+					"username": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"password": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: authenticateStudent,
+			},
 		},
 	})
 
