@@ -23,7 +23,25 @@ type Student struct {
 	Email    string `json:"email"`
 }
 
-
+var userTypeEnum = graphql.NewEnum(
+	graphql.EnumConfig{
+		Name: "userType",
+		Description: "A enum selection of user types",
+		Values: graphql.EnumValueConfigMap{
+			"Admin": &graphql.EnumValueConfig{
+				Value: 1,
+				Description: "The Admin User",
+			},
+			"Teacher": &graphql.EnumValueConfig{
+				Value: 2,
+				Description: "The Teacher User",
+			},
+			"Student": &graphql.EnumValueConfig{
+				Value: 3,
+				Description: "The Student User",
+			},
+		},
+	})
 
 var adminType = graphql.NewObject(
 	graphql.ObjectConfig{

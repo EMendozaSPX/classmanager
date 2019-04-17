@@ -41,7 +41,7 @@ func init() {
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
-			"listAdmins": &graphql.Field {
+			"listUsers": &graphql.Field {
 				Type: graphql.NewList(adminType),
 				Description: "Get a list of admin users",
 				Resolve: listAdminsResolver,
@@ -55,10 +55,13 @@ func init() {
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
-			"signinAdmin": &graphql.Field{
+			"signin": &graphql.Field{
 				Type: graphql.String,
-				Description: "sign in admin users through json web tokens",
+				Description: "Sign in users through json web tokens.",
 				Args: graphql.FieldConfigArgument{
+					"userType": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(userTypeEnum),
+					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
@@ -66,33 +69,7 @@ func init() {
 						Type: graphql.NewNonNull(graphql.String),
 					},
 				},
-				Resolve: authenticateAdmin,
-			},
-			"signinTeacher": &graphql.Field{
-				Type: graphql.String,
-				Description: "sign in teacher users through json web tokens",
-				Args: graphql.FieldConfigArgument{
-					"username": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"password": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
-				Resolve: authenticateTeacher,
-			},
-			"signinStudent": &graphql.Field{
-				Type: graphql.String,
-				Description: "sign in student users through json web tokens",
-				Args: graphql.FieldConfigArgument{
-					"username": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-					"password": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.String),
-					},
-				},
-				Resolve: authenticateStudent,
+				Resolve: authenticateUser,
 			},
 		},
 	})
