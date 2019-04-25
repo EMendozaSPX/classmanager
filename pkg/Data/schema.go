@@ -41,7 +41,7 @@ func init() {
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.Fields{
-			"listUsers": &graphql.Field {
+			"listAdmins": &graphql.Field {
 				Type: graphql.NewList(adminType),
 				Description: "Get a list of admin users",
 				Resolve: listAdminsResolver,
