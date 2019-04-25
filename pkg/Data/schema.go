@@ -55,7 +55,7 @@ func init() {
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
-			"signin": &graphql.Field{
+			"login": &graphql.Field{
 				Type: graphql.String,
 				Description: "Sign in users through json web tokens.",
 				Args: graphql.FieldConfigArgument{

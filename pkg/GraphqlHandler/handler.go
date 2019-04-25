@@ -49,7 +49,6 @@ type requestOptionsCompatability struct {
 }
 
 // This function formats a graphql query using the variables from the post request
-// This function
 func getFromForm(values url.Values) *RequestOptions {
 	// Gets the grahphql query from the post request
 	query := values.Get("query")

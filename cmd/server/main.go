@@ -17,14 +17,14 @@ func main() {
 	// Creates the http route graphql
 	http.Handle("/graphql", h)
 
-	// static file handler, a callback function that serves static (React) files
-	static := http.FileServer(http.Dir("web"))
+	// serve index.html as a static file
+	root := http.FileServer(http.Dir("./web/build"))
+
+	// serve index.html at http root
+	http.Handle("/", root)
 
 	// print instructions to console
 	fmt.Println("open localhost:3030 in web browser")
-
-	// serve static files at http root
-	http.Handle("/", static)
 
 	// deploy dev server
 	err := http.ListenAndServe(":3030", nil)

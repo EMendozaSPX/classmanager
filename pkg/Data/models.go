@@ -28,15 +28,15 @@ var userTypeEnum = graphql.NewEnum(
 		Name: "userType",
 		Description: "A enum selection of user types",
 		Values: graphql.EnumValueConfigMap{
-			"Admin": &graphql.EnumValueConfig{
+			"admin": &graphql.EnumValueConfig{
 				Value: 1,
 				Description: "The Admin User",
 			},
-			"Teacher": &graphql.EnumValueConfig{
+			"teacher": &graphql.EnumValueConfig{
 				Value: 2,
 				Description: "The Teacher User",
 			},
-			"Student": &graphql.EnumValueConfig{
+			"student": &graphql.EnumValueConfig{
 				Value: 3,
 				Description: "The Student User",
 			},
