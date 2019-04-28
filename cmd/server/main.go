@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/emendoza/classmanager/pkg/Data"
+	"github.com/emendoza/classmanager/pkg/Schema"
 	"github.com/emendoza/classmanager/pkg/GraphqlHandler"
 	"log"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 func main() {
 	// Create a handler for the graphql queries
 	h := GraphqlHandler.New(&GraphqlHandler.Config{
-		Schema: &Data.Schema,
+		Schema: &Schema.Schema,
 	})
 
 	// Creates the http route graphql

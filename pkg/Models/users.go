@@ -1,31 +1,18 @@
-package Data
+package Models
 
 import "github.com/graphql-go/graphql"
 
-// Admin user struct that serializes into json
-type Admin struct {
+// User struct that serializes into json
+type User struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
-// Teacher user struct that serializes into json
-type Teacher struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-}
-
-// Student user struct that serializes into json
-type Student struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-}
-
-var userTypeEnum = graphql.NewEnum(
+// Graphql user enum type definition
+var UserTypeEnum = graphql.NewEnum(
 	graphql.EnumConfig{
-		Name: "userType",
+		Name: "usertype",
 		Description: "A enum selection of user types",
 		Values: graphql.EnumValueConfigMap{
 			"admin": &graphql.EnumValueConfig{
@@ -43,9 +30,10 @@ var userTypeEnum = graphql.NewEnum(
 		},
 	})
 
-var adminType = graphql.NewObject(
+// graphql User Type definition
+var UserType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "Admins",
+		Name: "User",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
 				Type: graphql.Int,
@@ -57,5 +45,4 @@ var adminType = graphql.NewObject(
 				Type: graphql.String,
 			},
 		},
-	},
-	)
+	})

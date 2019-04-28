@@ -81,4 +81,4 @@ fabric.properties
 /.idea/
 /vendor/
 
-env.json
+# /pkg/Env/Constants.go

@@ -1,4 +1,4 @@
-package Data
+package Schema
 
 import (
 	"errors"
@@ -8,8 +8,9 @@ import (
 	"github.com/graphql-go/graphql"
 	"log"
 )
+
 // returns the jwt authorization token
-var authenticateUser = func(p graphql.ResolveParams) (interface{}, error) {
+var loginResolver = func(p graphql.ResolveParams) (interface{}, error) {
 	// save username and password parameters to local variables
 	usernameInput := p.Args["username"].(string)
 	passwordInput := p.Args["password"].(string)
@@ -19,7 +20,7 @@ var authenticateUser = func(p graphql.ResolveParams) (interface{}, error) {
 
 	// get username, email and password from database
 	// if the query failed send the error username not found to client
-	switch p.Args["userType"].(int) {
+	switch p.Args["usertype"].(int) {
 	case 1:
 		err := db.QueryRow(`SELECT username, email, password FROM classmanager.admins WHERE username = $1`,
 			usernameInput).Scan(&username, &email, &password)
@@ -48,11 +49,29 @@ var authenticateUser = func(p graphql.ResolveParams) (interface{}, error) {
 	// if the verify password is successful create token
 	if Auth.VerifyPassword(passwordInput, password) {
 		// store variables in token
-		token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-			"user_type": "Admin",
-			"username": username,
-			"email": email,
-		})
+		var token *jwt.Token
+		switch p.Args["usertype"].(int) {
+		case 1:
+			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+				"usertype": "admin",
+				"username": username,
+				"email":    email,
+			})
+		case 2:
+			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+				"usertype": "teacher",
+				"username": username,
+				"email":    email,
+			})
+		case 3:
+			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+				"usertype": "student",
+				"username": username,
+				"email":    email,
+			})
+		default:
+			return nil, errors.New("failed to sign token")
+		}
 
 		// sign token with secret key
 		tokenString, err := token.SignedString(Env.GetSecretKey())
@@ -67,4 +86,21 @@ var authenticateUser = func(p graphql.ResolveParams) (interface{}, error) {
 
 	// return authentication failed if password verification failed
 	return nil, errors.New("authentication failed")
+}
+
+// verifies users authorization to access certain pages on the website
+var verifyAuthorizationResolver = func(p graphql.ResolveParams) (interface{}, error) {
+	token := p.Context.Value("token").(string)
+
+	// check which usertype needs to be authorized
+	switch p.Args["usertype"].(int) {
+	case 1:
+		return Auth.VerifyToken(token, "admin"), nil
+	case 2:
+		return Auth.VerifyToken(token, "teacher"), nil
+	case 3:
+		return Auth.VerifyToken(token, "student"), nil
+	default:
+		return nil, errors.New("user does not have required permissions")
+	}
 }

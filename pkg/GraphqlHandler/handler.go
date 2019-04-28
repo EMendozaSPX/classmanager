@@ -134,7 +134,18 @@ func NewRequestOptions(r *http.Request) *RequestOptions {
 func (h *Handler) ContextHandler(contextValue context.Context, w http.ResponseWriter, r *http.Request) {
 	opts := NewRequestOptions(r)
 
-	ctx := context.WithValue(contextValue, "token", r.Header.Get("token"))
+	tokenStr := r.Header.Get("authorization")
+
+	var token string
+
+	if tokenStr == "" {
+		token = ""
+	} else {
+		token = strings.Split(tokenStr, "Bearer ")[1]
+	}
+
+	ctx := context.WithValue(contextValue, "token", token)
+
 	params := graphql.Params{
 		Schema: *h.Schema,
 		RequestString: opts.Query,
