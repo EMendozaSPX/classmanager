@@ -70,8 +70,30 @@ func init() {
 				Resolve: loginResolver,
 			},
 			"createYearConfiguration": &graphql.Field{
-				Type: Models.
-			}
+				Type: Models.YearConfigType,
+				Description: "Create a year configuration for the current year",
+				Args: graphql.FieldConfigArgument{
+					"year": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"yearGroup": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"terms": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.TermInput),
+					},
+					"publicHolidays": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.PublicHolidayInput),
+					},
+					"events": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.EventInput),
+					},
+					"periods": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.PeriodInput),
+					},
+				},
+				Resolve: createYearConfigResolver,
+			},
 			"createUser": &graphql.Field{
 				Type: Models.UserType,
 				Description: "Create a new user.",

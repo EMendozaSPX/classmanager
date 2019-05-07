@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/emendoza/classmanager/pkg/Auth"
 	"github.com/emendoza/classmanager/pkg/Env"
+	"github.com/emendoza/classmanager/pkg/Models"
 	"github.com/graphql-go/graphql"
 	"log"
 )
@@ -20,22 +21,22 @@ var loginResolver = func(p graphql.ResolveParams) (interface{}, error) {
 
 	// get username, email and password from database
 	// if the query failed send the error username not found to client
-	switch p.Args["usertype"].(int) {
-	case 1:
+	switch p.Args["usertype"].(Models.Usertype) {
+	case Models.Admin:
 		err := db.QueryRow(`SELECT username, email, password FROM classmanager.admins WHERE username = $1`,
 			usernameInput).Scan(&username, &email, &password)
 		if err != nil {
 			log.Println(err)
 			return nil, errors.New("username of usertype admin not found")
 		}
-	case 2:
+	case Models.Teacher:
 		err := db.QueryRow(`SELECT username, email, password FROM classmanager.teachers WHERE username = $1`,
 			usernameInput).Scan(&username, &email, &password)
 		if err != nil {
 			log.Println(err)
 			return nil, errors.New("username of usertype teacher not found")
 		}
-	case 3:
+	case Models.Student:
 		err := db.QueryRow(`SELECT username, email, password FROM classmanager.students WHERE username = $1`,
 			usernameInput).Scan(&username, &email, &password)
 		if err != nil {
@@ -50,20 +51,20 @@ var loginResolver = func(p graphql.ResolveParams) (interface{}, error) {
 	if Auth.VerifyPassword(passwordInput, password) {
 		// store variables in token
 		var token *jwt.Token
-		switch p.Args["usertype"].(int) {
-		case 1:
+		switch p.Args["usertype"].(Models.Usertype) {
+		case Models.Admin:
 			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 				"usertype": "admin",
 				"username": username,
 				"email":    email,
 			})
-		case 2:
+		case Models.Teacher:
 			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 				"usertype": "teacher",
 				"username": username,
 				"email":    email,
 			})
-		case 3:
+		case Models.Student:
 			token = jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 				"usertype": "student",
 				"username": username,
@@ -93,12 +94,12 @@ var verifyAuthorizationResolver = func(p graphql.ResolveParams) (interface{}, er
 	token := p.Context.Value("token").(string)
 
 	// check which usertype needs to be authorized
-	switch p.Args["usertype"].(int) {
-	case 1:
+	switch p.Args["usertype"].(Models.Usertype) {
+	case Models.Admin:
 		return Auth.VerifyToken(token, "admin"), nil
-	case 2:
+	case Models.Teacher:
 		return Auth.VerifyToken(token, "teacher"), nil
-	case 3:
+	case Models.Student:
 		return Auth.VerifyToken(token, "student"), nil
 	default:
 		return nil, errors.New("user does not have required permissions")

@@ -2,6 +2,14 @@ package Models
 
 import "github.com/graphql-go/graphql"
 
+// Golang equivalent to enum of usertype declaration
+type Usertype int
+const (
+	Admin   Usertype = 1
+	Teacher Usertype = 2
+	Student Usertype = 3
+)
+
 // User struct that serializes into json
 type User struct {
 	ID       int64  `json:"id"`
@@ -16,15 +24,15 @@ var UserTypeEnum = graphql.NewEnum(
 		Description: "A enum selection of user types",
 		Values: graphql.EnumValueConfigMap{
 			"admin": &graphql.EnumValueConfig{
-				Value: 1,
+				Value: Admin,
 				Description: "The Admin User",
 			},
 			"teacher": &graphql.EnumValueConfig{
-				Value: 2,
+				Value: Teacher,
 				Description: "The Teacher User",
 			},
 			"student": &graphql.EnumValueConfig{
-				Value: 3,
+				Value: Student,
 				Description: "The Student User",
 			},
 		},

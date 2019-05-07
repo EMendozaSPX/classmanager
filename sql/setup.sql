@@ -1,1 +1,22 @@
 CREATE SCHEMA classmanager;
+
+CREATE TABLE classmanager.admins (
+    ID SERIAL PRIMARY KEY,
+    Username VARCHAR(100) UNIQUE NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE classmanager.teachers (
+    ID SERIAL PRIMARY KEY,
+    Username VARCHAR(100) UNIQUE NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE classmanager.students (
+    ID SERIAL PRIMARY KEY,
+    Username VARCHAR(100) UNIQUE NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Password VARCHAR(100) NOT NULL
+);

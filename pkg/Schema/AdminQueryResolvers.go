@@ -27,20 +27,20 @@ var listUsersResolver = func(p graphql.ResolveParams) (interface{}, error) {
 		rows *sql.Rows
 		err error
 	)
-	switch p.Args["usertype"].(int) {
-	case 1:
+	switch p.Args["usertype"].(Models.Usertype) {
+	case Models.Admin:
 		rows, err = db.Query("SELECT id, username, email FROM classmanager.admins")
 		if err != nil {
 			log.Println(err)
 		}
 		defer rows.Close()
-	case 2:
+	case Models.Teacher:
 		rows, err = db.Query("SELECT id, username, email FROM classmanager.teachers")
 		if err != nil {
 			log.Println(err)
 		}
 		defer rows.Close()
-	case 3:
+	case Models.Student:
 		rows, err = db.Query("SELECT id, username, email FROM classmanager.students")
 		if err != nil {
 			log.Println(err)
