@@ -28,8 +28,8 @@ func init() {
 				Type: graphql.Boolean,
 				Description: "Provides a user access to a particular site",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 				},
 				Resolve: verifyAuthorizationResolver,
@@ -38,8 +38,8 @@ func init() {
 				Type: graphql.NewList(Models.UserType),
 				Description: "Get a list users of a certain usertype",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 				},
 				Resolve: listUsersResolver,
@@ -57,8 +57,8 @@ func init() {
 				Type: graphql.String,
 				Description: "Sign in users through json web tokens.",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
@@ -69,6 +69,7 @@ func init() {
 				},
 				Resolve: loginResolver,
 			},
+			/*
 			"createYearConfiguration": &graphql.Field{
 				Type: Models.YearConfigType,
 				Description: "Create a year configuration for the current year",
@@ -98,8 +99,8 @@ func init() {
 				Type: Models.UserType,
 				Description: "Create a new user.",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
@@ -113,6 +114,8 @@ func init() {
 				},
 				Resolve: createUserResolver,
 			},
+
+			 */
 		},
 	})
 

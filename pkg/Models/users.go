@@ -3,25 +3,26 @@ package Models
 import "github.com/graphql-go/graphql"
 
 // Golang equivalent to enum of usertype declaration
-type Usertype int
+type Role string
 const (
-	Admin   Usertype = 1
-	Teacher Usertype = 2
-	Student Usertype = 3
+	Admin   Role = "admin"
+	Teacher Role = "teacher"
+	Student Role = "student"
 )
 
 // User struct that serializes into json
 type User struct {
 	ID       int64  `json:"id"`
+	Role     Role   `json:"role"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
-// Graphql user enum type definition
-var UserTypeEnum = graphql.NewEnum(
+// Graphql user roles enum type definition
+var RoleEnum = graphql.NewEnum(
 	graphql.EnumConfig{
-		Name: "usertype",
-		Description: "A enum selection of user types",
+		Name: "role",
+		Description: "A enum selection of user roles",
 		Values: graphql.EnumValueConfigMap{
 			"admin": &graphql.EnumValueConfig{
 				Value: Admin,
@@ -45,6 +46,9 @@ var UserType = graphql.NewObject(
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
 				Type: graphql.Int,
+			},
+			"role": &graphql.Field{
+				Type: RoleEnum,
 			},
 			"username": &graphql.Field{
 				Type: graphql.String,

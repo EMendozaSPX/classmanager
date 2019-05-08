@@ -4,5 +4,5 @@ package Env
 // DO NOT USE THIS CONFIG IN PRODUCTION!!!!!
 var dbUser = &DatabaseUser{
 	Username: "emendoza",
-	Password: "ThoughOfEverything",
+	Password: "ThoughtOfEverything",
 }

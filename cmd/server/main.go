@@ -24,7 +24,7 @@ func main() {
 	http.Handle("/", root)
 
 	// print instructions to console
-	fmt.Println("open localhost:3030 in web browser")
+	fmt.Println("open http://localhost:3030 in web browser")
 
 	// deploy dev server
 	err := http.ListenAndServe(":3030", nil)
