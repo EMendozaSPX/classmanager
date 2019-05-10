@@ -54,12 +54,9 @@ func init() {
 		Name: "Mutation",
 		Fields: graphql.Fields{
 			"login": &graphql.Field{
-				Type: graphql.String,
+				Type: Models.LoginType,
 				Description: "Sign in users through json web tokens.",
 				Args: graphql.FieldConfigArgument{
-					"role": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.RoleEnum),
-					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
@@ -69,7 +66,6 @@ func init() {
 				},
 				Resolve: loginResolver,
 			},
-			/*
 			"createYearConfiguration": &graphql.Field{
 				Type: Models.YearConfigType,
 				Description: "Create a year configuration for the current year",
@@ -95,6 +91,7 @@ func init() {
 				},
 				Resolve: createYearConfigResolver,
 			},
+			/*
 			"createUser": &graphql.Field{
 				Type: Models.UserType,
 				Description: "Create a new user.",

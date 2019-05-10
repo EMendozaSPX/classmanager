@@ -13,7 +13,6 @@ import (
 // returns the jwt authorization token
 var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	// save parameters to variables for convenience
-	roleInput := params.Args["role"].(Models.Role)
 	usernameInput := params.Args["username"].(string)
 	passwordInput := params.Args["password"].(string)
 
@@ -22,13 +21,13 @@ var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	var username, email, password string
 
 	err := db.QueryRow(
-		`SELECT (role, username, email, password) 
+		`SELECT role, username, email, password
         FROM classmanager.users 
-        WHERE (role = $1, username = $2
-              )`,
-		roleInput, usernameInput).Scan(&role, &username, &email, &password)
+        WHERE username = $1;`,
+		usernameInput).Scan(&role, &username, &email, &password)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, errors.New("username not found")
 	}
 
 	// if the verify password is successful create token
@@ -47,8 +46,13 @@ var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 			return nil, err
 		}
 
+		loginVar := Models.Login{
+			Token: tokenString,
+			Role: role,
+		}
+
 		// return token
-		return tokenString, nil
+		return loginVar, nil
 	}
 
 	// return authentication failed if password verification failed

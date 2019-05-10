@@ -18,6 +18,12 @@ type User struct {
 	Email    string `json:"email"`
 }
 
+// Login struct serializes into json
+type Login struct {
+	Token string `json:"token"`
+	Role  Role   `json:"role"`
+}
+
 // Graphql user roles enum type definition
 var RoleEnum = graphql.NewEnum(
 	graphql.EnumConfig{
@@ -55,6 +61,19 @@ var UserType = graphql.NewObject(
 			},
 			"email": &graphql.Field{
 				Type: graphql.String,
+			},
+		},
+	})
+
+var LoginType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Login",
+		Fields: graphql.Fields{
+			"token": &graphql.Field{
+				Type: graphql.String,
+			},
+			"role": &graphql.Field{
+				Type: RoleEnum,
 			},
 		},
 	})
