@@ -6,8 +6,8 @@ import (
 	"github.com/emendoza/classmanager/pkg/Env"
 )
 
-// verify if token is valid for given usertype
-func VerifyToken(tokenString string, usertype string) bool {
+// verify if token is valid for given user role
+func VerifyToken(tokenString string, role string) bool {
 	// Verify if token exists
 	if tokenString == "" {
 		fmt.Println("Token not found")
@@ -33,7 +33,7 @@ func VerifyToken(tokenString string, usertype string) bool {
 	}
 
 	// verify user
-	if claims["usertype"] == usertype {
+	if claims["role"] == role {
 		return true
 	}
 	fmt.Println("user not validated")

@@ -28,8 +28,8 @@ func init() {
 				Type: graphql.Boolean,
 				Description: "Provides a user access to a particular site",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 				},
 				Resolve: verifyAuthorizationResolver,
@@ -38,8 +38,8 @@ func init() {
 				Type: graphql.NewList(Models.UserType),
 				Description: "Get a list users of a certain usertype",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 				},
 				Resolve: listUsersResolver,
@@ -54,12 +54,9 @@ func init() {
 		Name: "Mutation",
 		Fields: graphql.Fields{
 			"login": &graphql.Field{
-				Type: graphql.String,
+				Type: Models.LoginType,
 				Description: "Sign in users through json web tokens.",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
-					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
@@ -70,14 +67,37 @@ func init() {
 				Resolve: loginResolver,
 			},
 			"createYearConfiguration": &graphql.Field{
-				Type: Models.
-			}
+				Type: Models.YearConfigType,
+				Description: "Create a year configuration for the current year",
+				Args: graphql.FieldConfigArgument{
+					"year": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"yearGroup": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"terms": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.TermInput),
+					},
+					"publicHolidays": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.PublicHolidayInput),
+					},
+					"events": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.EventInput),
+					},
+					"periods": &graphql.ArgumentConfig{
+						Type: graphql.NewList(Models.PeriodInput),
+					},
+				},
+				Resolve: createYearConfigResolver,
+			},
+			/*
 			"createUser": &graphql.Field{
 				Type: Models.UserType,
 				Description: "Create a new user.",
 				Args: graphql.FieldConfigArgument{
-					"usertype": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.UserTypeEnum),
+					"role": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(Models.RoleEnum),
 					},
 					"username": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
@@ -91,6 +111,8 @@ func init() {
 				},
 				Resolve: createUserResolver,
 			},
+
+			 */
 		},
 	})
 
