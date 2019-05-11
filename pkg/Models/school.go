@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-type TermID int
+type TermID string
 const (
-	Term1 TermID = 1
-	Term2 TermID = 2
-	Term3 TermID = 3
-	Term4 TermID = 4
+	Term1 TermID = "term1"
+	Term2 TermID = "term2"
+	Term3 TermID = "term3"
+	Term4 TermID = "term4"
 )
 
 var TermEnum = graphql.NewEnum(
@@ -39,6 +39,7 @@ var TermEnum = graphql.NewEnum(
 
 // School configuration for the year per year group struct
 type YearConfig struct {
+	ID             int             `json:"id"`
 	Year           int             `json:"year"`
 	YearGroup      int             `json:"yearGroup"`
 	Terms          []Term          `json:"terms"`
@@ -49,7 +50,7 @@ type YearConfig struct {
 
 // School Term struct
 type Term struct {
-	Term      TermID    `json:"term"`
+	Name      TermID    `json:"name"`
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }
@@ -81,7 +82,7 @@ var termType = graphql.NewObject(
 		Name: "term",
 		Description: "School Term object type",
 		Fields: graphql.Fields{
-			"term": &graphql.Field{
+			"name": &graphql.Field{
 				Type: TermEnum,
 			},
 			"startTime": &graphql.Field{
@@ -152,6 +153,9 @@ var YearConfigType = graphql.NewObject(
 		Name: "yearConfig",
 		Description: "A year configuration object type",
 		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
 			"year": &graphql.Field{
 				Type: graphql.Int,
 			},
