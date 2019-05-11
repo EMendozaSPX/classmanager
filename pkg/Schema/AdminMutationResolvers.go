@@ -30,9 +30,9 @@ var createYearConfigResolver = func(params graphql.ResolveParams) (interface{}, 
 		terms := params.Args["terms"].([]Models.Term)
 		for _, term := range terms {
 			_, err := db.Exec(
-				`INSERT INTO classmanager.terms (year_id, term, start_time, end_time) 
+				`INSERT INTO classmanager.terms (year_id, name, start_time, end_time) 
                 VALUES ($1, $2, $3, $4);`,
-				    yearId, term.Term, term.StartTime, term.EndTime)
+				    yearId, term.Name, term.StartTime, term.EndTime)
 			if err != nil {
 				log.Println(err)
 				return nil, err
@@ -80,8 +80,16 @@ var createYearConfigResolver = func(params graphql.ResolveParams) (interface{}, 
 			}
 		}
 	}
-	savedVars := Models.YearConfig{
 
+	savedVars := Models.YearConfig{
+		ID: yearId,
+		Year: params.Args["year"].(int),
+		YearGroup: params.Args["yearGroup"].(int),
+		Terms: params.Args["terms"].([]Models.Term),
+		PublicHolidays: params.Args["publicHolidays"].([]Models.PublicHoliday),
+		Events: params.Args["events"].([]Models.Event),
+		Periods: params.Args["periods"].([]Models.Period),
 	}
+	return savedVars, nil
 }
 

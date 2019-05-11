@@ -4,16 +4,16 @@ import "github.com/graphql-go/graphql"
 
 var TermInput = graphql.NewInputObject(
 	graphql.InputObjectConfig{
-		Name: "term",
+		Name: "termInput",
 		Description: "A term input type",
-		Fields: graphql.Fields{
-			"term": &graphql.Field{
+		Fields: graphql.InputObjectConfigFieldMap{
+			"name": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(TermEnum),
 			},
-			"startTime": &graphql.Field{
+			"startTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
-			"endTime": &graphql.Field{
+			"endTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
 		},
@@ -21,16 +21,16 @@ var TermInput = graphql.NewInputObject(
 
 var PublicHolidayInput = graphql.NewInputObject(
 	graphql.InputObjectConfig{
-		Name: "schoolHoliday",
-		Description: "A school holiday input type",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
+		Name: "publicHolidayInput",
+		Description: "A public holiday input type",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"name": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"startTime": &graphql.Field{
+			"startTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
-			"endTime": &graphql.Field{
+			"endTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
 		},
@@ -38,19 +38,19 @@ var PublicHolidayInput = graphql.NewInputObject(
 
 var EventInput = graphql.NewInputObject(
 	graphql.InputObjectConfig{
-		Name: "event",
+		Name: "eventInput",
 		Description: "A event input type",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
+		Fields: graphql.InputObjectConfigFieldMap{
+			"name": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"classes": &graphql.Field{
+			"classes": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewList(ClassType),
 			},
-			"startTime": &graphql.Field{
+			"startTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
-			"endTime": &graphql.Field{
+			"endTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
 		},
@@ -58,16 +58,16 @@ var EventInput = graphql.NewInputObject(
 
 var PeriodInput = graphql.NewInputObject(
 	graphql.InputObjectConfig{
-		Name: "period",
+		Name: "periodInput",
 		Description: "A period input type",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
+		Fields: graphql.InputObjectConfigFieldMap{
+			"name": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"startTime": &graphql.Field{
+			"startTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
-			"endTime": &graphql.Field{
+			"endTime": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.DateTime),
 			},
 		},
