@@ -63,7 +63,7 @@ var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 var verifyAuthorizationResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	// save parameters as variables for convenience
 	token := params.Context.Value("token").(string)
-	role := params.Context.Value("role").(string)
+	role := params.Context.Value("role").(Models.Role)
 
 	// return token verification boolean
 	return Auth.VerifyToken(token, role), nil

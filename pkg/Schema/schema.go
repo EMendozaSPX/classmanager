@@ -34,15 +34,20 @@ func init() {
 				},
 				Resolve: verifyAuthorizationResolver,
 			},
-			"listUsers": &graphql.Field {
+			"listUsers": &graphql.Field{
 				Type: graphql.NewList(Models.UserType),
 				Description: "Get a list users of a certain usertype",
+				Resolve: listUsersResolver,
+			},
+			"readUser": &graphql.Field{
+				Type: Models.UserType,
+				Description: "Get a user from database",
 				Args: graphql.FieldConfigArgument{
-					"role": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(Models.RoleEnum),
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
 					},
 				},
-				Resolve: listUsersResolver,
+				Resolve: getUsersResolver,
 			},
 		},
 	})
@@ -66,32 +71,6 @@ func init() {
 				},
 				Resolve: loginResolver,
 			},
-			"createYearConfiguration": &graphql.Field{
-				Type: Models.YearConfigType,
-				Description: "Create a year configuration for the current year",
-				Args: graphql.FieldConfigArgument{
-					"year": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"yearGroup": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-					"terms": &graphql.ArgumentConfig{
-						Type: graphql.NewList(Models.TermInput),
-					},
-					"publicHolidays": &graphql.ArgumentConfig{
-						Type: graphql.NewList(Models.PublicHolidayInput),
-					},
-					"events": &graphql.ArgumentConfig{
-						Type: graphql.NewList(Models.EventInput),
-					},
-					"periods": &graphql.ArgumentConfig{
-						Type: graphql.NewList(Models.PeriodInput),
-					},
-				},
-				Resolve: createYearConfigResolver,
-			},
-			/*
 			"createUser": &graphql.Field{
 				Type: Models.UserType,
 				Description: "Create a new user.",
@@ -111,8 +90,38 @@ func init() {
 				},
 				Resolve: createUserResolver,
 			},
-
-			 */
+			"updateUser": &graphql.Field{
+				Type: Models.UserType,
+				Description: "Update a users information.",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"role": &graphql.ArgumentConfig{
+						Type: Models.RoleEnum,
+					},
+					"username": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					"email": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+					"password": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: updateUserResolver,
+			},
+			"deleteUser": &graphql.Field{
+				Type: Models.UserType,
+				Description: "Remove a user from database.",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: deleteUserResolver,
+			},
 		},
 	})
 
