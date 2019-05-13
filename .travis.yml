@@ -1,4 +1,11 @@
 language: go
 
 go:
-- master
+  - master
+  - "1.12"
+
+env:
+  - GO111MODULE=on
+
+git:
+  submodules: false

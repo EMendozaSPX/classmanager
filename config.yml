@@ -1,0 +1,6 @@
+secret_key: TBak+DTT4ESZkGwyVrXGSlG3ImiZWOBthnf1Kiwk//k=
+database:
+  username: emendoza
+  password: ThoughtOfEverything
+  name: classmanager
+  port: "5433"

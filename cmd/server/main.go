@@ -2,36 +2,34 @@ package main
 
 import (
 	"fmt"
+	"github.com/emendoza/classmanager/pkg/Schema"
+	"github.com/emendoza/classmanager/pkg/GraphqlHandler"
+	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
-	e, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(e)
-	/*
-	// h is a callback function that handles http requests and responses
-	// h handles all graphql data requests and responses in the route /graphql
-	h := handler.New(&handler.Config{
-
+	// Create a handler for the graphql queries
+	h := GraphqlHandler.New(&GraphqlHandler.Config{
+		Schema: &Schema.Schema,
 	})
 
 	// Creates the http route graphql
 	http.Handle("/graphql", h)
-	 */
 
-	// static file handler, a callback function that serves static (React) files
-	static := http.FileServer(http.Dir("web"))
+	// serve index.html as a static file
+	root := http.FileServer(http.Dir("./web/build"))
+
+	// serve index.html at http root
+	http.Handle("/", root)
 
 	// print instructions to console
-	fmt.Println("open localhost:3000 in web browser")
-
-	// serve static files at http root
-	http.Handle("/", static)
+	fmt.Println("open http://localhost:3030 in web browser")
 
 	// deploy dev server
-	http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(":3030", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
