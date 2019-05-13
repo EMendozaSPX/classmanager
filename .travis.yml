@@ -1,11 +1,11 @@
 language: go
 
 go:
-- master
-- "1.12"
+  - master
+  - "1.12"
 
-script:
-  - env GO111MODULE=on go build
+env:
+  - GO111MODULE=on
 
 git:
   submodules: false
