@@ -17,11 +17,12 @@ func init() {
 	var err error
 
 	// Get database user config from env package
-	dbUser := Env.GetDatabaseUser()
+	dbConfig := Env.GetDatabaseConfig()
 
 	// Create a postgres database configuration
-	connStr := fmt.Sprintf("user=%v password=%v dbname=classmanager port=5433 sslmode=disable",
-		dbUser.Username, dbUser.Password)
+	connStr := fmt.Sprintf("user=%v password=%v dbname=%v port=%v sslmode=disable",
+		dbConfig.Username, dbConfig.Password, dbConfig.Name, dbConfig.Port)
+	fmt.Println(connStr)
 
 	// Open database using configuration
 	db, err = sql.Open("postgres", connStr)

@@ -81,4 +81,4 @@ fabric.properties
 /.idea/
 /vendor/
 
-# /pkg/Env/Constants.go
+# config.yml
