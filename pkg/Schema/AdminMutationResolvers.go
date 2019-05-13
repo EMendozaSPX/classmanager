@@ -21,7 +21,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	// block scoping sql insert statement so variables will go out of scope within the function
 	{
 		// save variables for convenient access
-		role := params.Args["role"].(string)
+		role := params.Args["role"].(Models.Role)
 		email := params.Args["email"].(string)
 		password := Auth.HashAndSalt(params.Args["password"].(string))
 
@@ -37,7 +37,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 
 	// return the created user
 	var user Models.User
-	err := db.QueryRow(`SELECT (id, role, username, email) FROM classmanager.users WHERE username=$1`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE username=$1`,
 		usernameInput).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -85,7 +85,7 @@ var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	}
 
 	var user Models.User
-	err := db.QueryRow(`SELECT (id, role, username, email) FROM classmanager.users WHERE id=$1`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1`,
 		id).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -94,5 +94,18 @@ var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 }
 
 var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
 
+	if Auth.VerifyToken(token, Models.Admin) {
+		return nil, errors.New("permission denied")
+	}
+
+	id := params.Args["id"].(int)
+	_, err := db.Exec(`DELETE FROM classmanager.users WHERE id=$1`, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return nil, nil
 }

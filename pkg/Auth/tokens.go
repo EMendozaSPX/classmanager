@@ -34,7 +34,7 @@ func VerifyToken(tokenString string, role Models.Role) bool {
 	}
 
 	// verify user
-	if claims["role"] == role {
+	if claims["role"] == string(role) {
 		return true
 	}
 	fmt.Println("user not validated")

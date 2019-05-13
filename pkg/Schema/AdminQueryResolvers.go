@@ -14,9 +14,9 @@ var listUsersResolver = func(params graphql.ResolveParams) (interface{}, error) 
 	var query string
 	token := params.Context.Value("token").(string)
 	if Auth.VerifyToken(token, Models.Admin) {
-		query = `SELECT (id, role, username, email) FROM classmanager.users`
+		query = `SELECT id, role, username, email FROM classmanager.users`
 	} else if Auth.VerifyToken(token, Models.Teacher) {
-		query = `SELECT (id, role, username, email) FROM classmaneger.users WHERE role="student"`
+		query = `SELECT id, role, username, email FROM classmaneger.users WHERE role="student"`
 	} else {
 		return nil, errors.New("permission denied")
 	}
@@ -52,7 +52,7 @@ var getUsersResolver = func(params graphql.ResolveParams) (interface{}, error) {
 
 	var user Models.User
 
-	err := db.QueryRow(`SELECT (id, role, username, email) FROM classmanager.users WHERE id=$1`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1`,
 		params.Args["id"].(int)).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
