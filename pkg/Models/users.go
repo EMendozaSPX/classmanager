@@ -12,7 +12,7 @@ const (
 
 // User struct that serializes into json
 type User struct {
-	ID       int64  `json:"id"`
+	ID       int64    `json:"id"`
 	Role     Role   `json:"role"`
 	Username string `json:"username"`
 	Email    string `json:"email"`

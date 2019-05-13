@@ -3,4 +3,6 @@ language: go
 go:
 - master
 - "1.12"
-- GO111MODULE=true
+
+script:
+  - env GO111MODULE=on go build

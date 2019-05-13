@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/emendoza/classmanager/pkg/Env"
+	"github.com/emendoza/classmanager/pkg/Models"
 )
 
 // verify if token is valid for given user role
-func VerifyToken(tokenString string, role string) bool {
+func VerifyToken(tokenString string, role Models.Role) bool {
 	// Verify if token exists
 	if tokenString == "" {
 		fmt.Println("Token not found")
@@ -33,7 +34,7 @@ func VerifyToken(tokenString string, role string) bool {
 	}
 
 	// verify user
-	if claims["role"] == role {
+	if claims["role"] == string(role) {
 		return true
 	}
 	fmt.Println("user not validated")

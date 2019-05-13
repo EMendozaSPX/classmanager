@@ -1,95 +1,111 @@
 package Schema
 
 import (
+	"errors"
+	"github.com/emendoza/classmanager/pkg/Auth"
 	"github.com/emendoza/classmanager/pkg/Models"
 	"github.com/graphql-go/graphql"
 	"log"
 )
 
-var createYearConfigResolver = func(params graphql.ResolveParams) (interface{}, error) {
+var createUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	// verify users authorization
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Admin) {
+		return nil, errors.New("permission denied")
+	}
+
+	// save username input to variable for convenient access
+	usernameInput := params.Args["username"].(string)
+
+	// block scoping sql insert statement so variables will go out of scope within the function
 	{
-		_, err := db.Exec(`INSERT INTO classmanager.year (year, year_group) VALUES ($1, $2)`,
-			params.Args["year"].(int), params.Args["yearGroup"].(int))
+		// save variables for convenient access
+		role := params.Args["role"].(Models.Role)
+		email := params.Args["email"].(string)
+		password := Auth.HashAndSalt(params.Args["password"].(string))
+
+		// insert data into database
+		_, err := db.Exec(
+			`INSERT INTO classmanager.users (role, username, email, password) VALUES ($1, $2, $3, $4)`,
+			role, usernameInput, email, password)
 		if err != nil {
 			log.Println(err)
 			return nil, err
 		}
 	}
 
-	var yearId int
-	{
-		err := db.QueryRow(`SELECT id FROM classmanager.year WHERE year=$1 AND year_group=$2`,
-			params.Args["year"].(int), params.Args["yearGroup"].(int)).Scan(&yearId)
-		if err != nil {
-			log.Println(err)
-			return nil, err
-		}
+	// return the created user
+	var user Models.User
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE username=$1`,
+		usernameInput).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
+	if err != nil {
+		log.Println(err)
 	}
 
-	{
-		terms := params.Args["terms"].([]Models.Term)
-		for _, term := range terms {
-			_, err := db.Exec(
-				`INSERT INTO classmanager.terms (year_id, name, start_time, end_time) 
-                VALUES ($1, $2, $3, $4);`,
-				    yearId, term.Name, term.StartTime, term.EndTime)
-			if err != nil {
-				log.Println(err)
-				return nil, err
-			}
-		}
-	}
-	{
-		publicHolidays := params.Args["publicHolidays"].([]Models.PublicHoliday)
-		for _, publicHoliday := range publicHolidays {
-			_, err := db.Exec(
-				`INSERT INTO classmanager.public_holidays (year_id, name, start_time, end_time)
-                VALUES ($1, $2, $3, $4);`,
-                    yearId, publicHoliday.Name, publicHoliday.StartTime, publicHoliday.EndTime)
-			if err != nil {
-				log.Println(err)
-				return nil, err
-			}
-		}
-	}
-	{
-		events := params.Args["events"].([]Models.Event)
-		for _, event := range events {
-			for _, class := range event.Classes {
-				_, err := db.Exec(
-					`INSERT INTO classmanager.events (year_id, class_id, name, start_time, end_time)
-                    VALUES ($1, $2, $3, $4, $5);`,
-					    yearId, class, event.Name, event.StartTime, event.EndTime)
-				if err != nil {
-					log.Println(err)
-					return nil, err
-				}
-			}
-		}
-	}
-	{
-		periods := params.Args["periods"].([]Models.Period)
-		for _, period := range periods {
-			_, err := db.Exec(
-				`INSERT INTO classmanager.periods (year_id, name, start_time, end_time)
-                VALUES ($1, $2, $3, $4);`,
-                    yearId, period.Name, period.StartTime, period.EndTime)
-			if err != nil {
-				log.Println(err)
-				return nil, err
-			}
-		}
-	}
-
-	savedVars := Models.YearConfig{
-		ID: yearId,
-		Year: params.Args["year"].(int),
-		YearGroup: params.Args["yearGroup"].(int),
-		Terms: params.Args["terms"].([]Models.Term),
-		PublicHolidays: params.Args["publicHolidays"].([]Models.PublicHoliday),
-		Events: params.Args["events"].([]Models.Event),
-		Periods: params.Args["periods"].([]Models.Period),
-	}
-	return savedVars, nil
+	return user, nil
 }
 
+var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Admin) {
+		return nil, errors.New("permission denied")
+	}
+
+	id := params.Args["id"].(int)
+	query := `UPDATE classmanager.users SET $1=$2 WHERE id=$3`
+
+	if role := params.Args["role"].(Models.Role); role != "" {
+		_, err := db.Exec(query, "role", role, id)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+	if username := params.Args["username"].(string); username != "" {
+		_, err := db.Exec(query, "username", username, id)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+	if email := params.Args["email"].(string); email != "" {
+		_, err := db.Exec(query, "email", email, id)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+	if passwordHash := Auth.HashAndSalt(params.Args["password"].(string)); passwordHash != "" {
+		_, err := db.Exec(query, "password", passwordHash, id)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+
+	var user Models.User
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1`,
+		id).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
+	if err != nil {
+		log.Println(err)
+	}
+	return user, nil
+}
+
+var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+
+	if Auth.VerifyToken(token, Models.Admin) {
+		return nil, errors.New("permission denied")
+	}
+
+	id := params.Args["id"].(int)
+	_, err := db.Exec(`DELETE FROM classmanager.users WHERE id=$1`, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return nil, nil
+}
