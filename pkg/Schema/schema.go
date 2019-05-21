@@ -2,6 +2,7 @@ package Schema
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/emendoza/classmanager/pkg/Database"
 	"github.com/emendoza/classmanager/pkg/Models"
 	"github.com/graphql-go/graphql"
@@ -12,6 +13,7 @@ var (
 	Schema graphql.Schema
 	db     *sql.DB
 )
+var permissionDenied = errors.New("permission denied")
 
 func init() {
 	// create a error variable to handle errors
@@ -48,6 +50,11 @@ func init() {
 					},
 				},
 				Resolve: getUsersResolver,
+			},
+			"listClasses": &graphql.Field{
+				Type: graphql.NewList(Models.ClassType),
+				Description: "Get a list of classes",
+				Resolve: listClassesResolver,
 			},
 		},
 	})
