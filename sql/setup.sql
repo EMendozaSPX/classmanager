@@ -18,12 +18,6 @@ CREATE TABLE class_student (
     student_id INTEGER NOT NULL REFERENCES users(id)
 );
 
-CREATE TABLE year (
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
-    year INTEGER NOT NULL,
-    year_group INTEGER NOT NULL
-);
-
 CREATE TABLE public_holidays (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
     year_id INTEGER NOT NULL REFERENCES year(id),
@@ -39,4 +33,11 @@ CREATE TABLE events (
     name VARCHAR(100) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL
+);
+
+CREATE TABLE timetable (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    class_id INTEGER NOT NULL REFERENCES classes(id),
+    period_name VARCHAR(50) NOT NULL,
+    week_day INTEGER NOT NULL
 );
