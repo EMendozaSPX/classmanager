@@ -1,7 +1,7 @@
 # Installation Guide
 ## Windows
-1. Install postgres using the postgres installer and create a password
-2. Run the sql shell
+1. Download and Install postgres database from https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+2. Open sql shell (psql) from the start menu
 3. on `Server [localhost]` press enter
 4. on `Database [postgres]` press enter
 5. on `Port [port]` press enter
