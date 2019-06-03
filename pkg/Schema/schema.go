@@ -56,6 +56,29 @@ func init() {
 				Description: "Get a list of classes",
 				Resolve: listClassesResolver,
 			},
+			/*
+			"viewTimetable": &graphql.Field{
+				Type: graphql.NewList(Models.TimetableType),
+				Description: "Get a user from database",
+				Args: graphql.FieldConfigArgument{
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: viewTimetableResolver,
+			},
+
+			 */
+			"listClassesByTeacher": &graphql.Field{
+				Type: graphql.NewList(Models.ClassType),
+				Description: "Get a list of a teachers classes",
+				Args: graphql.FieldConfigArgument{
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listClassesByTeacher,
+			},
 		},
 	})
 
@@ -128,6 +151,19 @@ func init() {
 					},
 				},
 				Resolve: deleteUserResolver,
+			},
+			"createClass": &graphql.Field{
+				Type: Models.ClassType,
+				Description: "Add a class to database",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: createClassResolver,
 			},
 		},
 	})

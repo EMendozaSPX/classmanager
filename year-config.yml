@@ -1,0 +1,42 @@
+year: 2019
+terms:
+- termName: term-1
+  startDate: 2019-01-30T00:00:00+11:00
+  endDate: 2019-04-12T00:00:00+10:00
+- termName: term-2
+  startDate: 2019-05-01T00:00:00+10:00
+  endDate: 2019-06-29T00:00:00+10:00
+- termName: term-3
+  startDate: 2019-07-24T00:00:00+10:00
+  endDate: 2019-09-28T00:00:00+10:00
+- termName: term-4
+  startDate: 2019-10-16T00:00:00+11:00
+  endDate: 2019-12-06T00:00:00+11:00
+periods:
+- periodName: homeroom
+  startTime: "08:43"
+  endTime: "08:57"
+- periodName: period-1
+  startTime: "08:57"
+  endTime: "09:50"
+- periodName: period-2
+  startTime: "09:50"
+  endTime: "10:43"
+- periodName: recess
+  startTime: "10:43"
+  endTime: "11:03"
+- periodName: period-3
+  startTime: "11:03"
+  endTime: "11:56"
+- periodName: period-4
+  startTime: "11:56"
+  endTime: "12:49"
+- periodName: lunch
+  startTime: "12:49"
+  endTime: "01:29"
+- periodName: period-5
+  startTime: "01:29"
+  endTime: "02:22"
+- periodName: period-6
+  startTime: "02:22"
+  endTime: "03:15"

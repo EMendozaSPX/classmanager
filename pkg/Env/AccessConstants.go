@@ -36,6 +36,9 @@ func init() {
 	if err := encodeYaml(); err != nil {
 		log.Fatal(err)
 	}
+	if err := parseYearConfig(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func GetSecretKey() []byte {
