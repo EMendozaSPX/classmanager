@@ -19,7 +19,7 @@ var listUsersResolver = func(params graphql.ResolveParams) (interface{}, error) 
 	var users []Models.User
 
 	// get data from database
-	rows, err := db.Query(`SELECT id, role, username, email FROM classmanager.users;`)
+	rows, err := db.Query(`SELECT id, role, username, email FROM users;`)
 	if err != nil {
 		log.Println(err)
 	}
@@ -46,7 +46,7 @@ var getUsersResolver = func(params graphql.ResolveParams) (interface{}, error) {
 
 	var user Models.User
 
-	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1;`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE id=$1;`,
 		params.Args["id"].(int)).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -64,7 +64,7 @@ var listClassesResolver = func(params graphql.ResolveParams) (interface{}, error
 
 	var classes []Models.Class
 
-	rows, err := db.Query(`SELECT * FROM classmanager.classes;`)
+	rows, err := db.Query(`SELECT * FROM classes;`)
 	if err != nil {
 		log.Println(err)
 	}
@@ -78,13 +78,13 @@ var listClassesResolver = func(params graphql.ResolveParams) (interface{}, error
 			log.Println(err)
 		}
 
-		err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1;`,
+		err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE id=$1;`,
 			teacherID).Scan(&class.Teacher.ID, &class.Teacher.Role, &class.Teacher.Username, &class.Teacher.Email)
 		if err != nil {
 			log.Println(err)
 		}
 
-		studentRows, err := db.Query(`SELECT student_id FROM classmanager.class_student WHERE class_id=$1;`,
+		studentRows, err := db.Query(`SELECT student_id FROM class_student WHERE class_id=$1;`,
 			class.ID)
 		if err != nil {
 			log.Println(err)
@@ -98,7 +98,7 @@ var listClassesResolver = func(params graphql.ResolveParams) (interface{}, error
 			if err := studentRows.Scan(&studentID); err != nil {
 				log.Println(err)
 			}
-			err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1;`,
+			err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE id=$1;`,
 				studentID).Scan(&student.ID, &student.Role, &student.Username, &student.Email)
 			if err != nil {
 				log.Println(err)

@@ -9,13 +9,13 @@ import (
 
 var selectUserByIdQuery = `
 SELECT role, username, email
-FROM classmanager.users
+FROM users
 WHERE id=$1
 `
 
 var selectStudentFromClassStudentQuery = `
 SELECT student_id
-FROM classmanager.class_student
+FROM class_student
 WHERE class_id=$1
 `
 
@@ -27,7 +27,7 @@ var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, erro
 
 	var classes []Models.Class
 
-	rows, err := db.Query(`SELECT id, class_id FROM classmanager.classes WHERE teacher_id=$1`,
+	rows, err := db.Query(`SELECT id, class_id FROM classes WHERE teacher_id=$1`,
 		params.Args["teacherId"].(int))
 	if err != nil {
 		log.Println(err)

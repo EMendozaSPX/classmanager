@@ -22,7 +22,7 @@ var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 
 	err := db.QueryRow(
 		`SELECT id, role, username, email, password
-        FROM classmanager.users 
+        FROM users 
         WHERE username = $1;`,
 		username).Scan(&user.ID, &user.Role, &user.Username, &user.Email, &passwordHash)
 	if err != nil {

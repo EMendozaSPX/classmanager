@@ -26,7 +26,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 
 		// insert data into database
 		_, err := db.Exec(
-			`INSERT INTO classmanager.users (role, username, email, password) VALUES ($1, $2, $3, $4);`,
+			`INSERT INTO users (role, username, email, password) VALUES ($1, $2, $3, $4);`,
 			role, usernameInput, email, password)
 		if err != nil {
 			log.Println(err)
@@ -36,7 +36,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 
 	// return the created user
 	var user Models.User
-	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE username=$1;`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE username=$1;`,
 		usernameInput).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -52,7 +52,7 @@ var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	}
 
 	id := params.Args["id"].(int)
-	query := `UPDATE classmanager.users SET $1=$2 WHERE id=$3;`
+	query := `UPDATE users SET $1=$2 WHERE id=$3;`
 
 	if role := params.Args["role"].(Models.Role); role != "" {
 		_, err := db.Exec(query, "role", role, id)
@@ -84,7 +84,7 @@ var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	}
 
 	var user Models.User
-	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE id=$1`,
 		id).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -100,7 +100,7 @@ var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	}
 
 	id := params.Args["id"].(int)
-	_, err := db.Exec(`DELETE FROM classmanager.users WHERE id=$1`, id)
+	_, err := db.Exec(`DELETE FROM users WHERE id=$1`, id)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -118,21 +118,21 @@ var createClassResolver = func(params graphql.ResolveParams) (interface{}, error
 	var class Models.Class
 
 	{
-		_, err := db.Exec(`INSERT INTO classmanager.classes (class_id, teacher_id) VALUES ($1, $2);`,
+		_, err := db.Exec(`INSERT INTO classes (class_id, teacher_id) VALUES ($1, $2);`,
 			params.Args["classId"].(string), params.Args["teacherId"].(int))
 		if err != nil {
 			log.Println(err)
 		}
 	}
 	{
-		err := db.QueryRow(`SELECT id FROM classmanager.classes WHERE class_id=$1;`,
+		err := db.QueryRow(`SELECT id FROM classes WHERE class_id=$1;`,
 			params.Args["classId"].(int)).Scan(&class.ID)
 		if err != nil {
 			log.Println(err)
 		}
 	}
 	{
-		err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1;`,
+		err := db.QueryRow(`SELECT id, role, username, email FROM users WHERE id=$1;`,
 			params.Args["teacherId"].(string)).Scan(&class.Teacher.ID, &class.Teacher.Role, &class.Teacher.Username, &class.Teacher.Email)
 		if err != nil {
 			log.Println(err)
