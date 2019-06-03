@@ -81,4 +81,4 @@ fabric.properties
 /.idea/
 /vendor/
 
-# config.yml
+config.yml

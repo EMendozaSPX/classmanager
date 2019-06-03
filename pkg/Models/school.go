@@ -5,56 +5,27 @@ import (
 	"time"
 )
 
-type TermID string
+type Weekday int
 const (
-	Term1 TermID = "term1"
-	Term2 TermID = "term2"
-	Term3 TermID = "term3"
-	Term4 TermID = "term4"
+	Weekend    Weekday = 0
+	Monday1    Weekday = 1
+	Tuesday1   Weekday = 2
+	Wednesday1 Weekday = 3
+	Thursday1  Weekday = 4
+	Friday1    Weekday = 5
+	Monday2    Weekday = 6
+	Tuesday2   Weekday = 7
+	Wednesday2 Weekday = 8
+	Thursday2  Weekday = 9
+	Friday2    Weekday = 10
 )
 
-var TermEnum = graphql.NewEnum(
-	graphql.EnumConfig{
-		Name: "enumID",
-		Description: "A enum of possible terms",
-		Values: graphql.EnumValueConfigMap{
-			"term1": &graphql.EnumValueConfig{
-				Value: Term1,
-				Description: "Term one",
-			},
-			"term2": &graphql.EnumValueConfig{
-				Value: Term2,
-				Description: "Term two",
-			},
-			"term3": &graphql.EnumValueConfig{
-				Value: Term3,
-				Description: "Term three",
-			},
-			"term4": &graphql.EnumValueConfig{
-				Value: Term4,
-				Description: "Term four",
-			},
-		},
-	})
-
-// School configuration for the year per year group struct
-type YearConfig struct {
-	ID             int             `json:"id"`
-	Year           int             `json:"year"`
-	YearGroup      int             `json:"yearGroup"`
-	Terms          []Term          `json:"terms"`
-	PublicHolidays []PublicHoliday `json:"publicHolidays"`
-	Events         []Event         `json:"events"`
-	Periods        []Period        `json:"periods"`
+type Timetable struct {
+	Period    string `json:"period"`
+	Class     string `json:"class"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
 }
-
-// School Term struct
-type Term struct {
-	Name      TermID    `json:"name"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
-}
-
 // Public Holidays struct
 type PublicHoliday struct {
 	Name      string    `json:"name"`
@@ -70,26 +41,22 @@ type Event struct {
 	EndTime         time.Time `json:"endTime"`
 }
 
-// Periods struct
-type Period struct {
-	Name      string    `json:"name"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
-}
-
-var termType = graphql.NewObject(
+var TimetableType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "term",
-		Description: "School Term object type",
+		Name: "timetable",
+		Description: "A timetable entry object type",
 		Fields: graphql.Fields{
-			"name": &graphql.Field{
-				Type: TermEnum,
+			"period": &graphql.Field{
+				Type: graphql.String,
+			},
+			"class": &graphql.Field{
+				Type: graphql.String,
 			},
 			"startTime": &graphql.Field{
-				Type: graphql.DateTime,
+				Type: graphql.String,
 			},
 			"endTime": &graphql.Field{
-				Type: graphql.DateTime,
+				Type: graphql.String,
 			},
 		},
 	})
@@ -127,52 +94,6 @@ var eventType = graphql.NewObject(
 			},
 			"endTime": &graphql.Field{
 				Type: graphql.DateTime,
-			},
-		},
-	})
-
-var periodType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "period",
-		Description: "A period object type",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"startTime": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-			"endTime": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-		},
-	})
-
-var YearConfigType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "yearConfig",
-		Description: "A year configuration object type",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"year": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"yearGroup": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"terms": &graphql.Field{
-				Type: graphql.NewList(termType),
-			},
-			"publicHolidays": &graphql.Field{
-				Type: graphql.NewList(publicHolidayType),
-			},
-			"events": &graphql.Field{
-				Type: graphql.NewList(eventType),
-			},
-			"periods": &graphql.Field{
-				Type: graphql.NewList(periodType),
 			},
 		},
 	})

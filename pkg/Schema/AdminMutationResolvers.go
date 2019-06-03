@@ -1,7 +1,6 @@
 package Schema
 
 import (
-	"errors"
 	"github.com/emendoza/classmanager/pkg/Auth"
 	"github.com/emendoza/classmanager/pkg/Models"
 	"github.com/graphql-go/graphql"
@@ -12,7 +11,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	// verify users authorization
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Admin) {
-		return nil, errors.New("permission denied")
+		return nil, permissionDenied
 	}
 
 	// save username input to variable for convenient access
@@ -27,7 +26,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 
 		// insert data into database
 		_, err := db.Exec(
-			`INSERT INTO classmanager.users (role, username, email, password) VALUES ($1, $2, $3, $4)`,
+			`INSERT INTO classmanager.users (role, username, email, password) VALUES ($1, $2, $3, $4);`,
 			role, usernameInput, email, password)
 		if err != nil {
 			log.Println(err)
@@ -37,7 +36,7 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 
 	// return the created user
 	var user Models.User
-	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE username=$1`,
+	err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE username=$1;`,
 		usernameInput).Scan(&user.ID, &user.Role, &user.Username, &user.Email)
 	if err != nil {
 		log.Println(err)
@@ -49,11 +48,11 @@ var createUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Admin) {
-		return nil, errors.New("permission denied")
+		return nil, permissionDenied
 	}
 
 	id := params.Args["id"].(int)
-	query := `UPDATE classmanager.users SET $1=$2 WHERE id=$3`
+	query := `UPDATE classmanager.users SET $1=$2 WHERE id=$3;`
 
 	if role := params.Args["role"].(Models.Role); role != "" {
 		_, err := db.Exec(query, "role", role, id)
@@ -97,7 +96,7 @@ var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	token := params.Context.Value("token").(string)
 
 	if Auth.VerifyToken(token, Models.Admin) {
-		return nil, errors.New("permission denied")
+		return nil, permissionDenied
 	}
 
 	id := params.Args["id"].(int)
@@ -108,4 +107,36 @@ var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 	}
 
 	return nil, nil
+}
+
+var createClassResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Admin) {
+		return nil, permissionDenied
+	}
+
+	var class Models.Class
+
+	{
+		_, err := db.Exec(`INSERT INTO classmanager.classes (class_id, teacher_id) VALUES ($1, $2);`,
+			params.Args["classId"].(string), params.Args["teacherId"].(int))
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	{
+		err := db.QueryRow(`SELECT id FROM classmanager.classes WHERE class_id=$1;`,
+			params.Args["classId"].(int)).Scan(&class.ID)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	{
+		err := db.QueryRow(`SELECT id, role, username, email FROM classmanager.users WHERE id=$1;`,
+			params.Args["teacherId"].(string)).Scan(&class.Teacher.ID, &class.Teacher.Role, &class.Teacher.Username, &class.Teacher.Email)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	return class, nil
 }

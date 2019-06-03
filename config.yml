@@ -1,6 +1,8 @@
-secret_key: TBak+DTT4ESZkGwyVrXGSlG3ImiZWOBthnf1Kiwk//k=
+port: :8001
+secret_key: dw6zEEP42LoU4TYIyGB6BS0ySSwadtNwhqKG+3iNcYw=
 database:
   username: emendoza
   password: ThoughtOfEverything
+  host: localhost
   name: classmanager
   port: "5433"
