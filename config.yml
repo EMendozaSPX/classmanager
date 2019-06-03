@@ -2,7 +2,7 @@ port: :8001
 secret_key: dw6zEEP42LoU4TYIyGB6BS0ySSwadtNwhqKG+3iNcYw=
 database:
   username: emendoza
-  password: ThoughtOfEverything
-  host: localhost
+  password: RedCat121
+  host: 134.209.110.48
   name: classmanager
-  port: "5433"
+  port: "5432"

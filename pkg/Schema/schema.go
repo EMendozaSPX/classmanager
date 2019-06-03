@@ -56,7 +56,6 @@ func init() {
 				Description: "Get a list of classes",
 				Resolve: listClassesResolver,
 			},
-			/*
 			"viewTimetable": &graphql.Field{
 				Type: graphql.NewList(Models.TimetableType),
 				Description: "Get a user from database",
@@ -67,8 +66,6 @@ func init() {
 				},
 				Resolve: viewTimetableResolver,
 			},
-
-			 */
 			"listClassesByTeacher": &graphql.Field{
 				Type: graphql.NewList(Models.ClassType),
 				Description: "Get a list of a teachers classes",

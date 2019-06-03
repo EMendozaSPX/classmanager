@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 CREATE SCHEMA classmanager;
 
 CREATE TABLE classmanager.class_student (
@@ -222,6 +223,50 @@ CREATE TABLE classmanager.year (
     id integer NOT NULL,
     year integer NOT NULL,
     year_group integer NOT NULL
+=======
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE classes (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    class_id VARCHAR(20) UNIQUE NOT NULL,
+    teacher_id INTEGER NOT NULL REFERENCES users(id)
+);
+
+CREATE TABLE class_student (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    class_id INTEGER NOT NULL REFERENCES classes(id),
+    student_id INTEGER NOT NULL REFERENCES users(id)
+);
+
+CREATE TABLE public_holidays (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    year_id INTEGER NOT NULL REFERENCES year(id),
+    name VARCHAR(100) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL
+);
+
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    year_id INTEGER NOT NULL REFERENCES year(id),
+    class_id INTEGER NOT NULL REFERENCES classes(id),
+    name VARCHAR(100) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL
+);
+
+CREATE TABLE timetable (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    class_id INTEGER NOT NULL REFERENCES classes(id),
+    period_name VARCHAR(50) NOT NULL,
+    week_day INTEGER NOT NULL
+>>>>>>> develop
 );
 
 
