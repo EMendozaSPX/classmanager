@@ -95,7 +95,7 @@ var updateUserResolver = func(params graphql.ResolveParams) (interface{}, error)
 var deleteUserResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 
-	if Auth.VerifyToken(token, Models.Admin) {
+	if !Auth.VerifyToken(token, Models.Admin) {
 		return nil, permissionDenied
 	}
 

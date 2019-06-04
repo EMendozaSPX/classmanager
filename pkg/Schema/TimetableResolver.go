@@ -17,7 +17,7 @@ SELECT classes.class_id
 FROM timetable
 INNER JOIN classes
 ON timetable.class_id=classes.id
-WHERE timetable.period_name=$1 AND timetable.week_day=$2 AND classes.teacher_id==$3
+WHERE (timetable.period_name=$1 AND timetable.week_day=$2 AND classes.teacher_id=$3);
 `
 
 // resolver function to view timetable query
