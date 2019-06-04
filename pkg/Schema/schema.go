@@ -162,9 +162,8 @@ func init() {
 				},
 				Resolve: createClassResolver,
 			},
-			/*
 			"createTimetableEntry": &graphql.Field{
-				Type: Models.Timetable,
+				Type: Models.PeriodType,
 				Description: "Create timetable entry",
 				Args: graphql.FieldConfigArgument{
 					"classId": &graphql.ArgumentConfig{
@@ -179,8 +178,6 @@ func init() {
 				},
 				Resolve: createTimetableEntryResolver,
 			},
-
-			 */
 		},
 	})
 
