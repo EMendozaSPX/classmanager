@@ -2,7 +2,6 @@ package Models
 
 import (
 	"github.com/graphql-go/graphql"
-	"time"
 )
 
 type Weekday int
@@ -20,27 +19,15 @@ const (
 	Friday2    Weekday = 10
 )
 
+// A struct that serializes into a timetable entry
 type Timetable struct {
 	Period    string `json:"period"`
 	Class     string `json:"class"`
 	StartTime string `json:"startTime"`
 	EndTime   string `json:"endTime"`
 }
-// Public Holidays struct
-type PublicHoliday struct {
-	Name      string    `json:"name"`
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
-}
 
-// Event struct for incursions, excursions and
-type Event struct {
-	Name            string    `json:"name"`
-	Classes         []Class   `json:"classes"`
-	StartTime       time.Time `json:"startTime"`
-	EndTime         time.Time `json:"endTime"`
-}
-
+// graphql timetable type declaration
 var TimetableType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "timetable",
@@ -57,43 +44,6 @@ var TimetableType = graphql.NewObject(
 			},
 			"endTime": &graphql.Field{
 				Type: graphql.String,
-			},
-		},
-	})
-
-var publicHolidayType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "publicHoliday",
-		Description: "Public holidays object type",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"startTime": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-			"endTime": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-		},
-	})
-
-var eventType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "event",
-		Description: "Excursions and incursions, or general events of school",
-		Fields: graphql.Fields{
-			"name": &graphql.Field{
-				Type: graphql.String,
-			},
-			"classes": &graphql.Field{
-				Type: graphql.NewList(ClassType),
-			},
-			"startTime": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-			"endTime": &graphql.Field{
-				Type: graphql.DateTime,
 			},
 		},
 	})

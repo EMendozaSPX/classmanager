@@ -72,3 +72,5 @@ var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, erro
 	}
 	return classes, nil
 }
+
+

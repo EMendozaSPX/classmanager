@@ -162,6 +162,25 @@ func init() {
 				},
 				Resolve: createClassResolver,
 			},
+			/*
+			"createTimetableEntry": &graphql.Field{
+				Type: Models.Timetable,
+				Description: "Create timetable entry",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"periodName": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"weekday": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: createTimetableEntryResolver,
+			},
+
+			 */
 		},
 	})
 
