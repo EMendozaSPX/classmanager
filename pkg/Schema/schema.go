@@ -52,7 +52,7 @@ func init() {
 				Resolve: getUsersResolver,
 			},
 			"viewTimetable": &graphql.Field{
-				Type: graphql.NewList(Models.TimetableType),
+				Type: Models.TimetableType,
 				Description: "Get a user from database",
 				Args: graphql.FieldConfigArgument{
 					"teacherId": &graphql.ArgumentConfig{
@@ -61,6 +61,7 @@ func init() {
 				},
 				Resolve: viewTimetableResolver,
 			},
+			/*
 			"listTeachersClasses": &graphql.Field{
 				Type: graphql.NewList(graphql.String),
 				Description: "List the names of a teachers classes",
@@ -81,6 +82,8 @@ func init() {
 				},
 				Resolve: viewClassResolver,
 			},
+
+			 */
 			"readBehaviourNote": &graphql.Field{
 				Type: Models.BehaviourNoteType,
 				Description: "Read a behaviour note",

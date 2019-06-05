@@ -22,14 +22,14 @@ const (
 // A struct that serializes into a period entry
 type Period struct {
 	PeriodName    string `json:"periodName"`
-	Class         string `json:"class"`
 	StartTime     string `json:"startTime"`
 	EndTime       string `json:"endTime"`
 }
 
 type Timetable struct {
-	Weekday Weekday  `json:"weekday"`
-	Periods []Period `json:"periods"`
+	Weekdays []Weekday  `json:"weekdays"`
+	Periods  []Period   `json:"periods"`
+	Classes  [][]string `json:"classes"`
 }
 
 // graphql timetable type declaration
@@ -39,9 +39,6 @@ var PeriodType = graphql.NewObject(
 		Description: "A period entry object type",
 		Fields: graphql.Fields{
 			"periodName": &graphql.Field{
-				Type: graphql.String,
-			},
-			"class": &graphql.Field{
 				Type: graphql.String,
 			},
 			"startTime": &graphql.Field{
@@ -56,13 +53,16 @@ var PeriodType = graphql.NewObject(
 var TimetableType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "timetable",
-		Description: "A timetble entry object",
+		Description: "A timetable entry object",
 		Fields: graphql.Fields{
-			"weekday": &graphql.Field{
-				Type: graphql.String,
+			"weekdays": &graphql.Field{
+				Type: graphql.NewList(graphql.String),
 			},
 			"periods": &graphql.Field{
 				Type: graphql.NewList(PeriodType),
+			},
+			"classes": &graphql.Field{
+				Type: graphql.NewList(graphql.NewList(graphql.String)),
 			},
 		},
 	})

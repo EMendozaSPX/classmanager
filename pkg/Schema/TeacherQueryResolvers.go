@@ -1,12 +1,6 @@
 package Schema
 
-import (
-	"github.com/emendoza/classmanager/pkg/Auth"
-	"github.com/emendoza/classmanager/pkg/Models"
-	"github.com/graphql-go/graphql"
-	"log"
-)
-
+/*
 var selectClassIdWithTeacherId = `
 SELECT class_id
 FROM classes
@@ -91,3 +85,5 @@ var viewClassResolver = func(params graphql.ResolveParams) (interface{}, error) 
 
 	}
 }
+
+ */

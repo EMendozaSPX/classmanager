@@ -34,6 +34,7 @@ var loginResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	if Auth.VerifyPassword(password, passwordHash) {
 		// store variables in token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+			"id": user.ID,
 			"role": user.Role,
 			"username": username,
 			"email": user.Email,

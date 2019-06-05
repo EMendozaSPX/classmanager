@@ -13,11 +13,11 @@ import (
 
 // Query Classes in the given weekday
 var timetableQuery = `
-SELECT classes.class_id
+SELECT timetable.period_name, classes.class_id
 FROM timetable
 INNER JOIN classes
 ON timetable.class_id=classes.id
-WHERE (timetable.period_name=$1 AND timetable.week_day=$2 AND classes.teacher_id=$3);
+WHERE timetable.week_day= $1 AND classes.teacher_id=$2;
 `
 
 // resolver function to view timetable query
@@ -28,10 +28,14 @@ var viewTimetableResolver = func(params graphql.ResolveParams) (interface{}, err
 		return nil, permissionDenied
 	}
 
-	var timetables []Models.Timetable
+	// variable to hold week days
+	var weekdays []Models.Weekday
 
-	// variable to hold timetable entries
+	// variable to hold period entries
 	var periods []Models.Period
+
+	// variable to hold classes entries
+	var classesList [][]string
 
 	// seperate time into day month and year variables
 	year, _, _ := time.Now().Date()
@@ -44,36 +48,64 @@ var viewTimetableResolver = func(params graphql.ResolveParams) (interface{}, err
 		return nil, errors.New("year not configured")
 	}
 
+	for _, EnvPeriod := range Env.GetYearConfig().Periods {
+		period := Models.Period{
+			PeriodName: EnvPeriod.PeriodName,
+			StartTime: EnvPeriod.StartTime,
+			EndTime: EnvPeriod.EndTime,
+		}
+		periods = append(periods, period)
+	}
+
 	for w := Models.Monday1; w <= Models.Friday2; w++ {
-		// loop through periods in year config and add to periods
-		for _, confPeriod := range Env.GetYearConfig().Periods {
-			var class string
-			err := db.QueryRow(timetableQuery, confPeriod.PeriodName, w, params.Args["teacherId"].(int)).Scan(&class)
-			if err != nil {
+		var classes []string
+
+		// query classes in timetable
+		rows, err := db.Query(timetableQuery, w, params.Args["teacherId"].(int))
+		if err != nil {
+			log.Println(err)
+		}
+
+		for rows.Next() {
+			var (
+				periodName string
+				className  string
+			)
+			if err := rows.Scan(&periodName, &className); err != nil {
 				log.Println(err)
 			}
 
-			if class == "" {
-				class = "Free Period"
-			}
+			for _, confPeriod := range Env.GetYearConfig().Periods {
+				var class string
 
-			period := Models.Period{
-				PeriodName: confPeriod.PeriodName,
-				Class: class,
-				StartTime: confPeriod.StartTime,
-				EndTime: confPeriod.EndTime,
-			}
-			periods = append(periods, period)
+				// create a class variable
+				if periodName == confPeriod.PeriodName {
+					class = className
+				} else {
+					class = "Free Period"
+				}
 
+				// add variables to sub lists
+				classes = append(classes, class)
+			}
+		}
+		if len(classes) <= 0 {
+			for i := 0; i < len(Env.GetYearConfig().Periods); i++ {
+				classes = append(classes,"Free Period")
+			}
 		}
 
-		timetable := Models.Timetable{
-			Weekday: w,
-			Periods: periods,
-		}
-
-		timetables = append(timetables, timetable)
+		// add variables to lists
+		weekdays = append(weekdays, w)
+		classesList = append(classesList, classes)
 	}
 
-	return timetables, nil
+	// create timetable struct
+	timetable := Models.Timetable{
+		Weekdays: weekdays,
+		Periods: periods,
+		Classes: classesList,
+	}
+
+	return timetable, nil
 }
