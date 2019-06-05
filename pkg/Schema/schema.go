@@ -66,7 +66,7 @@ func init() {
 				Type: graphql.NewList(graphql.String),
 				Description: "List the names of a teachers classes",
 				Args: graphql.FieldConfigArgument{
-					"teacherId": &graphql.ArgumentConfig{
+					"teacherId": &grap	hql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
 					},
 				},

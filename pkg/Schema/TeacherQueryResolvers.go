@@ -1,8 +1,5 @@
 package Schema
-<<<<<<< HEAD
 
-/*
-=======
 /*
 import (
 	"github.com/emendoza/classmanager/pkg/Auth"
@@ -11,7 +8,6 @@ import (
 	"log"
 )
 
->>>>>>> crud_task_marks
 var selectClassIdWithTeacherId = `
 SELECT class_id
 FROM classes
