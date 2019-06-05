@@ -51,11 +51,6 @@ func init() {
 				},
 				Resolve: getUsersResolver,
 			},
-			"listClasses": &graphql.Field{
-				Type: graphql.NewList(Models.ClassType),
-				Description: "Get a list of classes",
-				Resolve: listClassesResolver,
-			},
 			"viewTimetable": &graphql.Field{
 				Type: graphql.NewList(Models.TimetableType),
 				Description: "Get a user from database",
@@ -66,15 +61,25 @@ func init() {
 				},
 				Resolve: viewTimetableResolver,
 			},
-			"listClassesByTeacher": &graphql.Field{
-				Type: graphql.NewList(Models.ClassType),
-				Description: "Get a list of a teachers classes",
+			"listTeachersClasses": &graphql.Field{
+				Type: graphql.NewList(graphql.String),
+				Description: "List the names of a teachers classes",
 				Args: graphql.FieldConfigArgument{
 					"teacherId": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
 					},
 				},
-				Resolve: listClassesByTeacher,
+				Resolve: listTeachersClassesResolver,
+			},
+			"viewClass": &graphql.Field{
+				Type: Models.ClassType,
+				Description: "Get a classes information",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: viewClassResolver,
 			},
 			"readBehaviourNote": &graphql.Field{
 				Type: Models.BehaviourNoteType,
@@ -293,6 +298,25 @@ func init() {
 					},
 				},
 				Resolve: deleteClassTaskResolver,
+			},
+			"createTaskMark": &graphql.Field{
+				Type: Models.TaskMarkType,
+				Description: "Create a task mark",
+				Args: graphql.FieldConfigArgument{
+					"taskId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"studentClassId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"taskMark": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"feedback": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: createTaskMarkResolver,
 			},
 		},
 	})

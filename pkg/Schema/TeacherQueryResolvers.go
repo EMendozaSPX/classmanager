@@ -7,68 +7,87 @@ import (
 	"log"
 )
 
-var selectTeacherQuery = `
-SELECT role, username, email
-FROM users
-WHERE id=$1;
+var selectClassIdWithTeacherId = `
+SELECT class_id
+FROM classes
+WHERE teacher_id=$1;
 `
 
-var selectStudentFromClassStudentQuery = `
-SELECT class_student.student_id, users.role, users.username, users.email
+var selectClassQuery = `
+SELECT classes.class_id, users.id, users.role, users.username, users.email
+FROM classes
+INNER JOIN users
+ON classes.teacher_id=users.id
+WHERE classes.id=$1
+`
+
+var selectStudentClass = `
+SELECT class_student.id, users.id, users.role, users.username, users.email
 FROM class_student
 INNER JOIN users
 ON class_student.student_id=users.id
-WHERE class_id=$1;
+WHERE class_student.class_id=$1;
 `
 
-var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, error) {
+var listTeachersClassesResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
 		return nil, permissionDenied
 	}
 
-	var classes []Models.Class
+	var classNames []string
 
-	rows, err := db.Query(`SELECT id, class_id FROM classes WHERE teacher_id=$1`,
-		params.Args["teacherId"].(int))
+	rows, err := db.Query(selectClassIdWithTeacherId, params.Args["teacherId"].(int))
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
 
 	for rows.Next() {
-		var class Models.Class
-
-		if err := rows.Scan(&class.ID, &class.ClassID); err != nil {
+		var className string
+		if err := rows.Scan(&className); err != nil {
 			log.Println(err)
+			return nil, err
 		}
 
-		{
-			var teacher Models.User
-			teacher.ID = params.Args["teacherId"].(int64)
-			err := db.QueryRow(selectTeacherQuery, teacher.ID).Scan(&teacher.Role, &teacher.Username, &teacher.Email)
-			if err != nil {
-				log.Println(err)
-			}
-			class.Teacher = teacher
-		}
-
-		studentRows, err := db.Query(selectStudentFromClassStudentQuery, class.ID)
-		if err != nil {
-			log.Println(err)
-		}
-
-		for studentRows.Next() {
-			var student Models.User
-
-			if err := studentRows.Scan(&student.ID, &student.Role, &student.Username, &student.Email); err != nil {
-				log.Println(err)
-			}
-
-			class.Students = append(class.Students, student)
-		}
-		classes = append(classes, class)
+		classNames = append(classNames, className)
 	}
-	return classes, nil
+	return classNames, nil
 }
 
+var viewClassResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
 
+	var class Models.Class
+	class.ID = params.Args["id"].(int)
+
+	err := db.QueryRow(selectClassQuery, class.ID).Scan(
+		&class.ClassID, &class.Teacher.ID, &class.Teacher.Role, &class.Teacher.Username, &class.Teacher.Email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	studentRows, err := db.Query(selectStudentClass, class.ID)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var students []Models.ClassStudent
+
+	for studentRows.Next() {
+		var student Models.ClassStudent
+		err := studentRows.Scan(
+			&student.ID, &student.Student.ID, &student.Student.Role, &student.Student.Username, &student.Student.Email)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+
+	}
+}

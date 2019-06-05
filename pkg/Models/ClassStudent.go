@@ -21,10 +21,10 @@ var ClassStudentType = graphql.NewObject(
 				Type: UserType,
 			},
 			"behaviourNotes": &graphql.Field{
-				Type: BehaviourNoteType,
+				Type: graphql.NewList(BehaviourNoteType),
 			},
 			"taskMarks": &graphql.Field{
-				Type: TaskMarkType,
+				Type: graphql.NewList(TaskMarkType),
 			},
 		},
 	})
