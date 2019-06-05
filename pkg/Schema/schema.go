@@ -86,13 +86,6 @@ func init() {
 				},
 				Resolve: readBehaviourNoteResolver,
 			},
-			"updateBehaviourNote": &graphql.Field{
-				Type: Models.BehaviourNoteType,
-				Description: "Update a behaviour note",
-				Args: graphql.FieldConfigArgument{
-					"id":
-				}
-			}
 		},
 	})
 
@@ -210,6 +203,32 @@ func init() {
 					},
 				},
 				Resolve: createBehaviourNoteResolver,
+			},
+			"updateBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Update a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"note": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: updateBehaviourNoteResolver,
+			},
+			"deleteBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Delete a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: deleteBehaviourNoteResolver,
 			},
 		},
 	})

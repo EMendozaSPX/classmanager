@@ -29,6 +29,12 @@ FROM behaviour_notes
 WHERE id=$1;
 `
 
+var updateBehaviourNote = `
+UPDATE behaviour_notes
+SET name=$1, note=$2, time_stamp=$3
+WHERE id=$4;
+`
+
 var createBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
@@ -74,4 +80,39 @@ var readBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{},
 		return nil, err
 	}
 	return behaviourNote, err
+}
+
+var updateBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
+
+	var behaviourNote Models.BehaviourNote
+	behaviourNote.ID = params.Args["id"].(int)
+	behaviourNote.Name = params.Args["name"].(string)
+	behaviourNote.Note = params.Args["note"].(string)
+	behaviourNote.TimeStamp = time.Now()
+	_, err := db.Exec(updateBehaviourNote,
+		behaviourNote.Name, behaviourNote.Note, behaviourNote.TimeStamp, behaviourNote.ID)
+
+	if err != nil {
+		return nil, err
+	}
+	return behaviourNote, nil
+}
+
+var deleteBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
+
+	var id = params.Args["id"].(int)
+	_, err := db.Exec(`DELETE FROM behaviour_notes WHERE id=$1`, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return nil, nil
 }
