@@ -1,5 +1,5 @@
 package Schema
-
+/*
 import (
 	"github.com/emendoza/classmanager/pkg/Auth"
 	"github.com/emendoza/classmanager/pkg/Models"
@@ -91,3 +91,5 @@ var viewClassResolver = func(params graphql.ResolveParams) (interface{}, error) 
 
 	}
 }
+
+ */
