@@ -7,16 +7,18 @@ import (
 	"log"
 )
 
-var selectUserByIdQuery = `
+var selectTeacherQuery = `
 SELECT role, username, email
 FROM users
-WHERE id=$1
+WHERE id=$1;
 `
 
 var selectStudentFromClassStudentQuery = `
-SELECT student_id
+SELECT class_student.student_id, users.role, users.username, users.email
 FROM class_student
-WHERE class_id=$1
+INNER JOIN users
+ON class_student.student_id=users.id
+WHERE class_id=$1;
 `
 
 var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, error) {
@@ -43,7 +45,7 @@ var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, erro
 		{
 			var teacher Models.User
 			teacher.ID = params.Args["teacherId"].(int64)
-			err := db.QueryRow(selectUserByIdQuery, teacher.ID).Scan(&teacher.Role, &teacher.Username, &teacher.Email)
+			err := db.QueryRow(selectTeacherQuery, teacher.ID).Scan(&teacher.Role, &teacher.Username, &teacher.Email)
 			if err != nil {
 				log.Println(err)
 			}
@@ -57,12 +59,8 @@ var listClassesByTeacher = func(params graphql.ResolveParams) (interface{}, erro
 
 		for studentRows.Next() {
 			var student Models.User
-			if err := studentRows.Scan(&student.ID); err != nil {
-				log.Println(err)
-			}
 
-			err := db.QueryRow(selectUserByIdQuery, student.ID).Scan(&student.Role, &student.Username, &student.Email)
-			if err != nil {
+			if err := studentRows.Scan(&student.ID, &student.Role, &student.Username, &student.Email); err != nil {
 				log.Println(err)
 			}
 
