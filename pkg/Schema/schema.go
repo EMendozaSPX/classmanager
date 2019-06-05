@@ -76,6 +76,23 @@ func init() {
 				},
 				Resolve: listClassesByTeacher,
 			},
+			"readBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Read a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readBehaviourNoteResolver,
+			},
+			"updateBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Update a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id":
+				}
+			}
 		},
 	})
 
@@ -177,6 +194,22 @@ func init() {
 					},
 				},
 				Resolve: createTimetableEntryResolver,
+			},
+			"createBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "create a behaviour note for a student",
+				Args: graphql.FieldConfigArgument{
+					"classStudentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"note": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: createBehaviourNoteResolver,
 			},
 		},
 	})

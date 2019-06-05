@@ -12,3 +12,8 @@
 2. pdesilva@stpiusx.nsw.edu.au
     * Username: pdsilva
     * Password: E=MC^2
+    
+## Students
+1. mend9@stpiusx.nsw.edu.au
+    * Username: mend9
+    * Password: OrangeJuice
