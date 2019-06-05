@@ -55,7 +55,8 @@ var createBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{
 		return nil, err
 	}
 
-	if err := db.QueryRow(`SELECT id FROM behaviour_notes WHERE name=$1`, behaviourNote.Name).Scan(&behaviourNote.ID); err != nil {
+	if err := db.QueryRow(`SELECT id FROM behaviour_notes WHERE name=$1`,
+		behaviourNote.Name).Scan(&behaviourNote.ID); err != nil {
 		log.Println(err)
 		return nil, err
 	}

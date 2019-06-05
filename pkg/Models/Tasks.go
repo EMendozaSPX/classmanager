@@ -8,8 +8,8 @@ import (
 type Task struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
-	TotalMarks  int       `json:"totalMarks"`
 	Description string    `json:"description"`
+	TotalMarks  int       `json:"totalMarks"`
 	DueTime     time.Time `json:"dueTime"`
 }
 
@@ -32,13 +32,13 @@ var TaskType = graphql.NewObject(
 			"name": &graphql.Field{
 				Type: graphql.String,
 			},
-			"totalMarks": &graphql.Field{
-				Type: graphql.Int,
-			},
 			"description": &graphql.Field{
 				Type: graphql.String,
 			},
-			"dueDate": &graphql.Field{
+			"totalMarks": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"dueTime": &graphql.Field{
 				Type: graphql.DateTime,
 			},
 		},
