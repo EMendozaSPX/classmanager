@@ -7,6 +7,7 @@ type Class struct {
 	ClassID  string `json:"classID"`
 	Teacher  User   `json:"teacher"`
 	Students []User `json:"students"`
+	Tasks    []Task `json:"tasks"`
 }
 
 var ClassType = graphql.NewObject(
@@ -25,6 +26,9 @@ var ClassType = graphql.NewObject(
 			},
 			"students": &graphql.Field{
 				Type: graphql.NewList(UserType),
+			},
+			"tasks": &graphql.Field{
+				Type: graphql.NewList(TaskType),
 			},
 		},
 	})

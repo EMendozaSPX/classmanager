@@ -86,6 +86,16 @@ func init() {
 				},
 				Resolve: readBehaviourNoteResolver,
 			},
+			"readClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Read a class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readClassTaskResolver,
+			},
 		},
 	})
 
@@ -229,6 +239,60 @@ func init() {
 					},
 				},
 				Resolve: deleteBehaviourNoteResolver,
+			},
+			"createClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Create a class task",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"description": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"totalMarks": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"dueTime": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.DateTime),
+					},
+				},
+				Resolve: createClassTaskResolver,
+			},
+			"updateClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Update a class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"description": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"totalMarks": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"dueTime": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.DateTime),
+					},
+				},
+				Resolve: updateClassTaskResolver,
+			},
+			"deleteClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Delete class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: deleteClassTaskResolver,
 			},
 		},
 	})
