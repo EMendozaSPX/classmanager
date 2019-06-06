@@ -71,19 +71,6 @@ func init() {
 				},
 				Resolve: listTeachersClassesResolver,
 			},
-			/*
-			"viewClass": &graphql.Field{
-				Type: Models.ClassType,
-				Description: "Get a classes information",
-				Args: graphql.FieldConfigArgument{
-					"id": &graphql.ArgumentConfig{
-						Type: graphql.NewNonNull(graphql.Int),
-					},
-				},
-				Resolve: viewClassResolver,
-			},
-
-			 */
 			"readBehaviourNote": &graphql.Field{
 				Type: Models.BehaviourNoteType,
 				Description: "Read a behaviour note",
@@ -103,6 +90,19 @@ func init() {
 					},
 				},
 				Resolve: readClassTaskResolver,
+			},
+			"readClassTaskMark": &graphql.Field{
+				Type: Models.TaskMarkType,
+				Description: "Read a students task mark",
+				Args: graphql.FieldConfigArgument{
+					"studentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+				    },
+					"taskId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readClassTaskMarkResolver,
 			},
 		},
 	})
