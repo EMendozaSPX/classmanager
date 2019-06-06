@@ -1,6 +1,5 @@
 package Schema
 
-
 import (
 	"github.com/emendoza/classmanager/pkg/Auth"
 	"github.com/emendoza/classmanager/pkg/Models"
@@ -8,18 +7,29 @@ import (
 	"log"
 )
 
-var selectClassIdWithTeacherId = `
-SELECT class_id
+var selectClassWithTeacherId = `
+SELECT classes.id, classes.class_id, users.role, users.username, users.email
 FROM classes
-WHERE teacher_id=$1;
+INNER JOIN users
+ON classes.teacher_id=users.id
+WHERE classes.teacher_id=$1;
 `
 
+var selectStudentFromClassStudent = `
+SELECT users.id, users.role, users.username, users.email
+FROM users
+INNER JOIN class_student
+ON class_student.student_id=users.id
+WHERE class_student.class_id=$1;
+`
+
+/*
 var selectClassQuery = `
 SELECT classes.class_id, users.id, users.role, users.username, users.email
 FROM classes
 INNER JOIN users
 ON classes.teacher_id=users.id
-WHERE classes.id=$1
+WHERE classes.id=$1;
 `
 
 var selectStudentClass = `
@@ -30,32 +40,55 @@ ON class_student.student_id=users.id
 WHERE class_student.class_id=$1;
 `
 
+ */
+
 var listTeachersClassesResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
 		return nil, permissionDenied
 	}
 
-	var classNames []string
+	var classes []Models.Class
 
-	rows, err := db.Query(selectClassIdWithTeacherId, params.Args["teacherId"].(int))
+	rows, err := db.Query(selectClassWithTeacherId, params.Args["teacherId"].(int))
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	for rows.Next() {
-		var className string
-		if err := rows.Scan(&className); err != nil {
+		var class Models.Class
+
+		class.Teacher.ID = params.Args["teacherId"].(int64)
+		err := rows.Scan(&class.ID, &class.ClassId, &class.Teacher.Role, &class.Teacher.Username, &class.Teacher.Email)
+		if err != nil {
 			log.Println(err)
 			return nil, err
 		}
 
-		classNames = append(classNames, className)
+		studentRows, err := db.Query(selectStudentFromClassStudent, class.ID)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		for studentRows.Next() {
+			var student Models.User
+
+			err := rows.Scan(&student.ID, &student.Role, &student.Username, &student.Email)
+			if err != nil {
+				log.Println(err)
+				return nil, err
+			}
+
+			class.Students = append(class.Students, student)
+		}
+		classes = append(classes, class)
 	}
-	return classNames, nil
+	return classes, nil
 }
 
+/*
 var viewClassResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
@@ -92,3 +125,5 @@ var viewClassResolver = func(params graphql.ResolveParams) (interface{}, error) 
 
 	}
 }
+
+ */
