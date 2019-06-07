@@ -18,6 +18,12 @@ CREATE TABLE class_student (
     student_id INTEGER NOT NULL REFERENCES users(id)
 );
 
+CREATE TABLE year (
+    id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+    year INTEGER,
+    year_group INTEGER
+);
+
 CREATE TABLE public_holidays (
     id SERIAL PRIMARY KEY UNIQUE NOT NULL,
     year_id INTEGER NOT NULL REFERENCES year(id),
