@@ -54,7 +54,7 @@ CREATE TABLE tasks (
     task_name VARCHAR(100) NOT NULL,
     total_mark INTEGER NOT NULL,
     task_description TEXT NOT NULL,
-    due_time TIMESTAMP NOT NULL,
+    due_time TIMESTAMP NOT NULL
 );
 
 CREATE TABLE task_marks (

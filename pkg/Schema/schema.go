@@ -71,6 +71,16 @@ func init() {
 				},
 				Resolve: listTeachersClassesResolver,
 			},
+			"listBehaviourNotes": &graphql.Field{
+				Type: graphql.NewList(Models.BehaviourNoteType),
+				Description: "List behaviour notes",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listBehaviourNotesResolver,
+			},
 			"readBehaviourNote": &graphql.Field{
 				Type: Models.BehaviourNoteType,
 				Description: "Read a behaviour note",

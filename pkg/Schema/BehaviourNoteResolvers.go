@@ -35,6 +35,15 @@ SET name=$1, note=$2, time_stamp=$3
 WHERE id=$4;
 `
 
+var listBehaviourNotesResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
+
+
+}
+
 var createBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
