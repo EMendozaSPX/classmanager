@@ -3,10 +3,11 @@ package Models
 import "github.com/graphql-go/graphql"
 
 type Class struct {
-	ID       int    `json:"id"`
-	ClassID  string `json:"classID"`
-	Teacher  User   `json:"teacher"`
-	Students []User `json:"students"`
+	ID       int            `json:"id"`
+	ClassId  string         `json:"classID"`
+	Teacher  User           `json:"teacher"`
+	Students []ClassStudent `json:"students"`
+	Tasks    []Task         `json:"tasks"`
 }
 
 var ClassType = graphql.NewObject(
@@ -17,14 +18,14 @@ var ClassType = graphql.NewObject(
 			"id": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"classID": &graphql.Field{
+			"classId": &graphql.Field{
 				Type: graphql.String,
 			},
 			"teacher": &graphql.Field{
 				Type: UserType,
 			},
 			"students": &graphql.Field{
-				Type: graphql.NewList(UserType),
+				Type: graphql.NewList(ClassStudentType),
 			},
 		},
 	})

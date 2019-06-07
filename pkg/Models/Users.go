@@ -12,16 +12,21 @@ const (
 
 // User struct that serializes into json
 type User struct {
-	ID       int64    `json:"id"`
+	ID       int    `json:"id"`
 	Role     Role   `json:"role"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
+type ClassStudent struct {
+	ID          int  `json:"id"`
+	StudentInfo User `json:"studentInfo"`
+}
+
 // Login struct serializes into json
 type Login struct {
 	Token string `json:"token"`
-	Role  Role   `json:"role"`
+	User  User   `json:"user"`
 }
 
 // Graphql user roles enum type definition
@@ -65,6 +70,19 @@ var UserType = graphql.NewObject(
 		},
 	})
 
+var ClassStudentType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "ClassStudent",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"studentInfo": &graphql.Field{
+				Type: UserType,
+			},
+		},
+	})
+
 var LoginType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Login",
@@ -72,8 +90,8 @@ var LoginType = graphql.NewObject(
 			"token": &graphql.Field{
 				Type: graphql.String,
 			},
-			"role": &graphql.Field{
-				Type: RoleEnum,
+			"user": &graphql.Field{
+				Type: UserType,
 			},
 		},
 	})

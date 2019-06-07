@@ -2,6 +2,7 @@ package Schema
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/emendoza/classmanager/pkg/Database"
 	"github.com/emendoza/classmanager/pkg/Models"
 	"github.com/graphql-go/graphql"
@@ -12,6 +13,7 @@ var (
 	Schema graphql.Schema
 	db     *sql.DB
 )
+var permissionDenied = errors.New("permission denied")
 
 func init() {
 	// create a error variable to handle errors
@@ -48,6 +50,89 @@ func init() {
 					},
 				},
 				Resolve: getUsersResolver,
+			},
+			"viewTimetable": &graphql.Field{
+				Type: Models.TimetableType,
+				Description: "Get a user from database",
+				Args: graphql.FieldConfigArgument{
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: viewTimetableResolver,
+			},
+			"listTeachersClasses": &graphql.Field{
+				Type: graphql.NewList(Models.ClassType),
+				Description: "List the names of a teachers classes",
+				Args: graphql.FieldConfigArgument{
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listTeachersClassesResolver,
+			},
+			"listBehaviourNotes": &graphql.Field{
+				Type: graphql.NewList(Models.BehaviourNoteType),
+				Description: "List behaviour notes",
+				Args: graphql.FieldConfigArgument{
+					"classStudentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listBehaviourNotesResolver,
+			},
+			"listClassTasksResolver": &graphql.Field{
+				Type: graphql.NewList(Models.TaskType),
+				Description: "List of Class Tasks",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listClassTasksResolver,
+			},
+			"listTaskMarksResolver": &graphql.Field{
+				Type: graphql.NewList(Models.TaskMarkType),
+				Description: "List of task marks",
+				Args: graphql.FieldConfigArgument{
+					"classStudentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listTaskMarksResolver,
+			},
+			"readBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Read a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readBehaviourNoteResolver,
+			},
+			"readClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Read a class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readClassTaskResolver,
+			},
+			"readClassTaskMark": &graphql.Field{
+				Type: Models.TaskMarkType,
+				Description: "Read a students task mark",
+				Args: graphql.FieldConfigArgument{
+					"studentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+				    },
+					"taskId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: readClassTaskMarkResolver,
 			},
 		},
 	})
@@ -121,6 +206,150 @@ func init() {
 					},
 				},
 				Resolve: deleteUserResolver,
+			},
+			"createClass": &graphql.Field{
+				Type: Models.ClassType,
+				Description: "Add a class to database",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"teacherId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: createClassResolver,
+			},
+			"createTimetableEntry": &graphql.Field{
+				Type: Models.PeriodType,
+				Description: "Create timetable entry",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"periodName": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"weekday": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: createTimetableEntryResolver,
+			},
+			"createBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "create a behaviour note for a student",
+				Args: graphql.FieldConfigArgument{
+					"classStudentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"note": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: createBehaviourNoteResolver,
+			},
+			"updateBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Update a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"note": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: updateBehaviourNoteResolver,
+			},
+			"deleteBehaviourNote": &graphql.Field{
+				Type: Models.BehaviourNoteType,
+				Description: "Delete a behaviour note",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: deleteBehaviourNoteResolver,
+			},
+			"createClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Create a class task",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"description": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"totalMarks": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"dueTime": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.DateTime),
+					},
+				},
+				Resolve: createClassTaskResolver,
+			},
+			"updateClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Update a class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"description": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"totalMarks": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"dueTime": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.DateTime),
+					},
+				},
+				Resolve: updateClassTaskResolver,
+			},
+			"deleteClassTask": &graphql.Field{
+				Type: Models.TaskType,
+				Description: "Delete class task",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: deleteClassTaskResolver,
+			},
+			"createTaskMark": &graphql.Field{
+				Type: Models.TaskMarkType,
+				Description: "Create a task mark",
+				Args: graphql.FieldConfigArgument{
+					"taskId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"studentClassId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"taskMark": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+					"feedback": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: createTaskMarkResolver,
 			},
 		},
 	})

@@ -11,6 +11,7 @@ import (
 
 // a struct type that holds all information not stored in a database
 type Config struct {
+	Port      string         `yaml:"port"`
 	SecretKey string         `yaml:"secret_key"`
 	Database  DatabaseConfig `yaml:"database"`
 }
@@ -19,6 +20,7 @@ type Config struct {
 type DatabaseConfig struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	Host     string `yaml:"host"`
 	Name     string `yaml:"name"`
 	Port     string `yaml:"port"`
 }
@@ -27,9 +29,19 @@ var fpath = "config.yml"
 
 var config Config
 
+func init() {
+	if err := decodeYaml(); err != nil {
+		log.Fatal(err)
+	}
+	if err := encodeYaml(); err != nil {
+		log.Fatal(err)
+	}
+	if err := parseYearConfig(); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func GetSecretKey() []byte {
-	decodeYaml()
-	encodeYaml()
 	secretKeyStr, err := base64.StdEncoding.DecodeString(config.SecretKey)
 	if err != nil {
 		log.Println(err)
@@ -37,36 +49,40 @@ func GetSecretKey() []byte {
 	return secretKeyStr
 }
 
+func GetPort() string {
+	return config.Port
+}
+
 func GetDatabaseConfig() DatabaseConfig {
-	decodeYaml()
-	encodeYaml()
 	return config.Database
 }
 
-func decodeYaml() {
+func decodeYaml() error {
 	fmt.Println("parsing yaml config file")
 	file, err := ioutil.ReadFile(fpath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := yaml.Unmarshal(file, &config); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if config.SecretKey == "" {
 		config.SecretKey = generateSecretKey()
 	}
+	return nil
 }
 
-func encodeYaml() {
-	fmt.Println("encoding toml config file")
+func encodeYaml() error {
+	fmt.Println("encoding yaml config file")
 	data, err := yaml.Marshal(&config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := ioutil.WriteFile(fpath, data, 0644); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 // generates a secret key to sign auth tokens

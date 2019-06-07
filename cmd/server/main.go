@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/emendoza/classmanager/pkg/Env"
 	"github.com/emendoza/classmanager/pkg/Schema"
 	"github.com/emendoza/classmanager/pkg/GraphqlHandler"
 	"log"
@@ -24,10 +25,10 @@ func main() {
 	http.Handle("/", root)
 
 	// print instructions to console
-	fmt.Println("open http://localhost:3030 in web browser")
+	fmt.Printf("open http://localhost%s in web browser \n", Env.GetPort())
 
 	// deploy dev server
-	err := http.ListenAndServe(":3030", nil)
+	err := http.ListenAndServe(Env.GetPort(), nil)
 
 	if err != nil {
 		log.Fatal(err)

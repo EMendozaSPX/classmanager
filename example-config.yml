@@ -1,0 +1,8 @@
+port: :8001
+secret_key: dw6zEEP42LoU4TYIyGB6BS0ySSwadtNwhqKG+3iNcYw=
+database:
+  username: ""
+  password: ""
+  host: ""
+  name: ""
+  port: ""
