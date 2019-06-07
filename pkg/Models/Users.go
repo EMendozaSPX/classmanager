@@ -18,6 +18,11 @@ type User struct {
 	Email    string `json:"email"`
 }
 
+type ClassStudent struct {
+	ID          int  `json:"id"`
+	StudentInfo User `json:"studentInfo"`
+}
+
 // Login struct serializes into json
 type Login struct {
 	Token string `json:"token"`
@@ -61,6 +66,19 @@ var UserType = graphql.NewObject(
 			},
 			"email": &graphql.Field{
 				Type: graphql.String,
+			},
+		},
+	})
+
+var ClassStudentType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "ClassStudent",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"studentInfo": &graphql.Field{
+				Type: UserType,
 			},
 		},
 	})

@@ -20,14 +20,61 @@ FROM task_marks
 WHERE student_class_id=$1 AND task_id=$2
 `
 
-var selectClassTaskWithStudentId = `
+var selectClassTask = `
 SELECT task_marks.id, task_marks.task_mark, task_marks.feedback, task_marks.time_stamp, 
        tasks.id, tasks.task_name, tasks.task_description, tasks.total_mark, tasks.due_time
 FROM task_marks
 INNER JOIN tasks
 ON task_marks.task_id=tasks.id
-WHERE student_class_id=$1, tasks.id=$2;
+WHERE task_marks.student_class_id=$1 AND tasks.id=$2;
 `
+
+var selectClassTaskWithStudentId = `
+SELECT task_marks.id, task_marks.task_mark, task_marks.feedback, task_marks.time_stamp,
+       tasks.id, tasks.task_name, tasks.task_description, tasks.total_mark, tasks.due_time
+FROM task_marks
+INNER JOIN tasks
+ON task_marks.task_id=tasks.id
+WHERE student_class_id=$1;
+`
+
+var listTaskMarksResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	// authenticate user
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
+
+	// variable to store a list of task marks
+	var taskMarks []Models.TaskMark
+
+	// query tasks
+	rows, err := db.Query(selectClassTaskWithStudentId, params.Args["studentClassId"])
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	// loop through rows
+	for rows.Next() {
+		// declare variable to hold task mark
+		var taskMark Models.TaskMark
+
+		// serialize taskMark
+		err := rows.Scan(&taskMark.ID, &taskMark.TaskMark, &taskMark.Feedback, &taskMark.TimeStamp,
+			&taskMark.AssignedTask.ID, &taskMark.AssignedTask.Name, &taskMark.AssignedTask.Description,
+			&taskMark.AssignedTask.TotalMarks, &taskMark.AssignedTask.DueTime)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		// add task mark to list
+		taskMarks = append(taskMarks, taskMark)
+	}
+
+	return taskMarks, nil
+}
 
 var createTaskMarkResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	// authenticate user
@@ -93,7 +140,7 @@ var readClassTaskMarkResolver = func(params graphql.ResolveParams) (interface{},
 
 	var taskMark Models.TaskMark
 
-	err := db.QueryRow(selectClassTaskWithStudentId,
+	err := db.QueryRow(selectClassTask,
 		params.Args["studentId"].(int), params.Args["taskId"].(int)).Scan(
 			&taskMark.ID, &taskMark.TaskMark, &taskMark.Feedback, &taskMark.TimeStamp, &taskMark.AssignedTask.ID,
 			&taskMark.AssignedTask.Name, &taskMark.AssignedTask.Description, &taskMark.AssignedTask.TotalMarks,

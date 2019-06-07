@@ -16,7 +16,7 @@ WHERE classes.teacher_id=$1;
 `
 
 var selectStudentFromClassStudent = `
-SELECT users.id, users.role, users.username, users.email
+SELECT class_student.id, users.id, users.role, users.username, users.email
 FROM users
 INNER JOIN class_student
 ON class_student.student_id=users.id
@@ -54,9 +54,11 @@ var listTeachersClassesResolver = func(params graphql.ResolveParams) (interface{
 		}
 
 		for studentRows.Next() {
-			var student Models.User
+			var student Models.ClassStudent
 
-			err := studentRows.Scan(&student.ID, &student.Role, &student.Username, &student.Email)
+			err := studentRows.Scan(
+				&student.ID, &student.StudentInfo.ID, &student.StudentInfo.Role,
+				&student.StudentInfo.Username, &student.StudentInfo.Email)
 			if err != nil {
 				log.Println(err)
 				return nil, err

@@ -31,6 +31,49 @@ SET task_name=$2, task_description=$3, total_mark=$4, due_time=$5
 WHERE id=$1;
 `
 
+var selectClassTasksQuery = `
+SELECT tasks.id, tasks.task_name, tasks.task_description, tasks.total_mark, tasks.due_time
+FROM tasks
+INNER JOIN classes
+ON tasks.class_id=classes.id
+WHERE classes.id=$1;
+`
+
+var listClassTasksResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	// authorization
+	token := params.Context.Value("token").(string)
+	if !Auth.VerifyToken(token, Models.Teacher) {
+		return nil, permissionDenied
+	}
+
+	// make a list of tasks to store a task in
+	var tasks []Models.Task
+
+	// query class task
+	rows, err := db.Query(selectClassTasksQuery, params.Args["classId"]);
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	// loop through rows from query
+	for rows.Next() {
+		// declare a task variable to hold the task
+		var task Models.Task
+
+		// serialize task with database query
+		if err := rows.Scan(&task.ID, &task.Name, &task.Description, &task.TotalMarks, &task.DueTime); err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		// add task to list
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}
+
 var createClassTaskResolver = func(params graphql.ResolveParams) (interface{}, error) {
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
