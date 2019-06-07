@@ -75,11 +75,31 @@ func init() {
 				Type: graphql.NewList(Models.BehaviourNoteType),
 				Description: "List behaviour notes",
 				Args: graphql.FieldConfigArgument{
-					"classId": &graphql.ArgumentConfig{
+					"classStudentId": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.Int),
 					},
 				},
 				Resolve: listBehaviourNotesResolver,
+			},
+			"listClassTasksResolver": &graphql.Field{
+				Type: graphql.NewList(Models.TaskType),
+				Description: "List of Class Tasks",
+				Args: graphql.FieldConfigArgument{
+					"classId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listClassTasksResolver,
+			},
+			"listTaskMarksResolver": &graphql.Field{
+				Type: graphql.NewList(Models.TaskMarkType),
+				Description: "List of task marks",
+				Args: graphql.FieldConfigArgument{
+					"classStudentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.Int),
+					},
+				},
+				Resolve: listTaskMarksResolver,
 			},
 			"readBehaviourNote": &graphql.Field{
 				Type: Models.BehaviourNoteType,

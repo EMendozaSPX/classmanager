@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// db queries
 var insertBehaviourNote = `
 INSERT INTO behaviour_notes (
     class_student_id,
@@ -35,13 +36,47 @@ SET name=$1, note=$2, time_stamp=$3
 WHERE id=$4;
 `
 
+var selectBehaviourNotesQuery = `
+SELECT id, name, note, time_stamp
+FROM behaviour_notes
+WHERE class_student_id=$1;
+`
+
+
 var listBehaviourNotesResolver = func(params graphql.ResolveParams) (interface{}, error) {
+	// authorization function
 	token := params.Context.Value("token").(string)
 	if !Auth.VerifyToken(token, Models.Teacher) {
 		return nil, permissionDenied
 	}
 
+	// create a behaviour note list for later usage
+	var behaviourNotes []Models.BehaviourNote
 
+	// storing classStudentId in a variable
+	classStudentId := params.Args["classStudentId"].(int)
+
+	// query database for behaviour notes of a student
+	rows, err := db.Query(selectBehaviourNotesQuery, classStudentId)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		// create a variable to store a behaviour note
+		var behaviourNote Models.BehaviourNote
+		err := rows.Scan(&behaviourNote.ID, &behaviourNote.Name, &behaviourNote.Note, &behaviourNote.TimeStamp)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		// append behaviour note to behaviour notes list
+		behaviourNotes = append(behaviourNotes, behaviourNote)
+	}
+
+	return behaviourNotes, nil
 }
 
 var createBehaviourNoteResolver = func(params graphql.ResolveParams) (interface{}, error) {
